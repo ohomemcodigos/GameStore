@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===================================
+// MODELO 1: JOGO (Game)
+// ===================================
+model Game {
+  id          Int       @id @default(autoincrement())
+  title       String    @unique
+  description String?
+  genre       String
+  price       Decimal
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  items       OrderItem[]   // Um jogo está em muitos OrderItems (itens de pedido)
+}
+
+// ===================================
+// MODELO 2: USUÁRIO (User)
+// ===================================
+model User {
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  name        String
+  password    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  orders      Order[] // O usuário tem muitos Orders (pedidos)
+}
+
+// ===================================
+// MODELO 3: PEDIDO/CARRINHO (Order)
+// ===================================
+model Order {
+  id           Int           @id @default(autoincrement())
+  userId       Int
+  status       String        @default("PENDING")
+  total        Decimal       
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // Relacionamentos
+  user         User          @relation(fields: [userId], references: [id])
+  items        OrderItem[]   // Um pedido tem muitos itens
+  transactions Transaction[] // Um pedido pode ter uma ou mais tentativas de pagamento
+}
+
+// ===================================
+// MODELO 4: ITENS DO PEDIDO (OrderItem)
+// ===================================
+model OrderItem {
+  orderId Int
+  gameId  Int
+  priceAtPurchase Decimal // Preço que o jogo custava no momento da compra
+  quantity Int @default(1)
+
+  // Relacionamentos
+  order Order @relation(fields: [orderId], references: [id])
+  game  Game  @relation(fields: [gameId], references: [id])
+
+  // Essa chave primária garante que cada jogo/pedido é único
+  @@id([orderId, gameId]) 
+}
+
+// ===================================
+// MODELO 5: TRANSAÇÃO (Transaction)
+// ===================================
+model Transaction {
+  id            Int       @id @default(autoincrement())
+  orderId       Int
+  status        String    // Ex: SUCCESS, FAILED, PROCESSING
+  amount        Decimal
+  paymentMethod String    // Ex: CREDIT_CARD, PIX
+  gatewayId     String?   // ID retornado pelo gateway de pagamento (simulado ou real)
+  createdAt     DateTime  @default(now())
+
+  // Relacionamento
+  order Order @relation(fields: [orderId], references: [id])
+}
