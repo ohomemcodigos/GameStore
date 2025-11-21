@@ -1,4 +1,3 @@
-// src/controllers/userController.ts
 import { Request, Response } from 'express';
 import { ZodError } from 'zod'; // Importando o type do erro do Zod
 import { registerUserSchema, updateUserSchema } from '../validators/userValidator';
@@ -14,7 +13,7 @@ export const registerUser = async (req: Request, res: Response) => {
         // Validação (Zod garante que os campos obrigatórios estão presentes)
         const validatedData = registerUserSchema.parse(req.body); 
         
-        // ✨ Chamando o Service para verificar existência e criptografar a senha ✨
+        // Chamando o Service para verificar existência e criptografar a senha
         const newUser = await UserService.register(validatedData);
 
         res.status(201).json(newUser); // Sucesso!
@@ -25,7 +24,7 @@ export const registerUser = async (req: Request, res: Response) => {
         }
         // Tratamento do erro lançado pelo Service (email já existe)
         if (error instanceof Error && error.message.includes("email já foi cadastrado")) {
-            return res.status(409).json({ error: error.message }); // Falha: Conflito 409
+            return res.status(409).json({ error: error.message }); // Falha...
         }
         res.status(500).json({ error: "Erro ao cadastrar o usuário." }); // Falha...
     }
@@ -37,20 +36,19 @@ export const loginUser = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
 
-        // Validação básica (Zod faria isso, mas mantemos por segurança extra)
         if ( !email || !password ) {
             return res.status(400).json({ error: "Os Campos de E-mail e de senha são obrigatórios." }); // Falha...
         }
         
-        // ✨ Chamando o Service para encontrar usuário e comparar a senha criptografada ✨
+        // Chamando o Service para encontrar usuário e comparar a senha criptografada
         const user = await UserService.login({ email, password });
 
         // Se o Service retornar null, as credenciais são inválidas
         if(!user) {
-            return res.status(401).json({ error: "As suas credenciais são inválidas." }); // Falha: Não Autorizado 401
+            return res.status(401).json({ error: "As suas credenciais são inválidas." }); // Falha...
         }
 
-        res.status(200).json(user); // Sucesso! (Senha já foi removida pelo Service)
+        res.status(200).json(user); // Sucesso!
 
     }catch (error) {
         res.status(500).json({ error: "Erro ao realizar Login." }); // Falha...
@@ -63,7 +61,7 @@ export const getUserById = async (req: Request, res: Response) => {
     try {
         const id = parseInt(req.params.id);
         
-        // ✨ Chamando o Service para buscar e remover a senha ✨
+        // Chamando o Service para buscar e remover a senha
         const user = await UserService.findById(id);
         
         if (!user){
@@ -84,7 +82,7 @@ export const updateUser = async (req: Request, res: Response) => {
         const id = parseInt(req.params.id);
         const validatedData = updateUserSchema.parse(req.body);
 
-        // ✨ Chamando o Service para atualizar (e criptografar nova senha, se houver) ✨
+        // Chamando o Service para atualizar (e criptografar nova senha, se houver)
         const updatedUser = await UserService.update(id, validatedData);
         
         res.status(200).json(updatedUser);
@@ -106,7 +104,7 @@ export const deleteUser = async (req: Request, res: Response) => {
     try {
         const id = parseInt(req.params.id);
         
-        // ✨ Chamando o Service para deletar ✨
+        // Chamando o Service para deletar
         await UserService.delete(id);
 
         res.status(204).send(); // Sucesso, sem conteúdo

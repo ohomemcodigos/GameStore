@@ -1,4 +1,3 @@
-// src/controllers/gameController.ts
 import { Request, Response } from "express";
 import { ZodError } from "zod";
 import { createGameSchema, updateGameSchema } from "../validators/gameValidator";

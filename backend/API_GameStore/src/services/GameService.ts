@@ -1,4 +1,3 @@
-// src/services/GameService.ts
 import { prisma } from "../index";
 
 type CreateGameData = any; 
