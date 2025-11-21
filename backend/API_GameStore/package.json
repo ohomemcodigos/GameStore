@@ -1,0 +1,41 @@
+{
+  "name": "api-de-game-store",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000A\u0000P\u0000I\u0000_\u0000G\u0000a\u0000m\u0000e\u0000S\u0000t\u0000o\u0000r\u0000e\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ohomemcodigos/API_GameStore.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ohomemcodigos/API_GameStore/issues"
+  },
+  "homepage": "https://github.com/ohomemcodigos/API_GameStore#readme",
+  "dependencies": {
+    "@prisma/client": "^6.16.3",
+    "express": "^5.1.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.7.0",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.16.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
