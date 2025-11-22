@@ -3,12 +3,12 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
-import { swaggerOptions } from '../config/swaggerOptions'; // Nossas opções
+import { swaggerOptions } from '../config/swaggerOptions'; //Configuração do Swagger
 
 //Importação das Rotas
 import gameRoutes from './routes/gameRoutes';
 import userRoutes from './routes/userRoutes';
-import purchaseRoutes from './routes/purchaseRoutes';
+import orderRoutes from './routes/orderRoutes';
 
 //Inicialização do app e do Prisma
 const app = express();
@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/games', gameRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/purchases', purchaseRoutes);
+app.use('/api/orders', orderRoutes);
 
 //Inicia o servidor
 app.listen(port, () => {
