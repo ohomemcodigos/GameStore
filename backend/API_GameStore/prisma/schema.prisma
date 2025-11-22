@@ -14,45 +14,46 @@ datasource db {
 // MODELO 1: JOGO (Game)
 // ===================================
 model Game {
-  id          Int       @id @default(autoincrement())
-  title       String    @unique
+  id          Int      @id @default(autoincrement())
+  title       String   @unique
   description String?
   genre       String
   price       Decimal
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-  items       OrderItem[]   // Um jogo está em muitos OrderItems (itens de pedido)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items       OrderItem[] // Um jogo está em muitos OrderItems (itens de pedido)
+  licenseKeys LicenseKey[] // Um jogo tem muitas LicenseKeys (chaves de licença)
 }
 
 // ===================================
 // MODELO 2: USUÁRIO (User)
 // ===================================
 model User {
-  id          Int       @id @default(autoincrement())
-  email       String    @unique
-  name        String
-  password    String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-  orders      Order[] // O usuário tem muitos Orders (pedidos)
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[] // O usuário tem muitos Orders (pedidos)
 }
 
 // ===================================
 // MODELO 3: PEDIDO/CARRINHO (Order)
 // ===================================
 model Order {
-  id           Int           @id @default(autoincrement())
-  userId       Int
-  status       String        @default("PENDING")
-  total        Decimal       
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  status    String   @default("PENDING")
+  total     Decimal
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relacionamentos
   user         User          @relation(fields: [userId], references: [id])
-  items        OrderItem[]   // Um pedido tem muitos itens
+  items        OrderItem[] // Um pedido tem muitos itens
   transactions Transaction[] // Um pedido pode ter uma ou mais tentativas de pagamento
 }
 
@@ -60,31 +61,49 @@ model Order {
 // MODELO 4: ITENS DO PEDIDO (OrderItem)
 // ===================================
 model OrderItem {
-  orderId Int
-  gameId  Int
+  id              Int     @id @default(autoincrement())
+  orderId         Int
+  gameId          Int
   priceAtPurchase Decimal // Preço que o jogo custava no momento da compra
-  quantity Int @default(1)
+  quantity        Int     @default(1)
 
   // Relacionamentos
-  order Order @relation(fields: [orderId], references: [id])
-  game  Game  @relation(fields: [gameId], references: [id])
+  order      Order       @relation(fields: [orderId], references: [id])
+  game       Game        @relation(fields: [gameId], references: [id])
+  licenseKey LicenseKey?
 
   // Essa chave primária garante que cada jogo/pedido é único
-  @@id([orderId, gameId]) 
+  @@unique([orderId, gameId])
 }
 
 // ===================================
 // MODELO 5: TRANSAÇÃO (Transaction)
 // ===================================
 model Transaction {
-  id            Int       @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   orderId       Int
-  status        String    // Ex: SUCCESS, FAILED, PROCESSING
+  status        String // Ex: SUCCESS, FAILED, PROCESSING
   amount        Decimal
-  paymentMethod String    // Ex: CREDIT_CARD, PIX
-  gatewayId     String?   // ID retornado pelo gateway de pagamento (simulado ou real)
-  createdAt     DateTime  @default(now())
+  paymentMethod String // Ex: CREDIT_CARD, PIX
+  gatewayId     String? // ID retornado pelo gateway de pagamento
+  createdAt     DateTime @default(now())
 
   // Relacionamento
   order Order @relation(fields: [orderId], references: [id])
+}
+
+// ===================================
+// MODELO 6: MODELO PARA CHAVES DE LICENÇA (LicenseKey)
+// ===================================
+model LicenseKey {
+  id          Int        @id @default(autoincrement())
+  keyString   String     @unique @db.VarChar(50) // A chave de ativação
+  isUsed      Boolean    @default(false) // TRUE se a chave já foi entregue a um cliente
+  gameId      Int // Relacionamento com o Jogo que esta chave pertence
+  game        Game       @relation(fields: [gameId], references: [id])
+  // Relacionamento com o Pedido que consumiu esta chave
+  orderItemId Int?       @unique
+  orderItem   OrderItem? @relation(fields: [orderItemId], references: [id])
+
+  createdAt DateTime @default(now())
 }
