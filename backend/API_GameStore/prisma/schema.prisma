@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -70,7 +71,7 @@ model OrderItem {
   // Relacionamentos
   order      Order       @relation(fields: [orderId], references: [id])
   game       Game        @relation(fields: [gameId], references: [id])
-  licenseKey LicenseKey?
+  licenseKeys LicenseKey[]
 
   // Essa chave primária garante que cada jogo/pedido é único
   @@unique([orderId, gameId])
@@ -102,7 +103,7 @@ model LicenseKey {
   gameId      Int // Relacionamento com o Jogo que esta chave pertence
   game        Game       @relation(fields: [gameId], references: [id])
   // Relacionamento com o Pedido que consumiu esta chave
-  orderItemId Int?       @unique
+  orderItemId     Int?
   orderItem   OrderItem? @relation(fields: [orderItemId], references: [id])
 
   createdAt DateTime @default(now())

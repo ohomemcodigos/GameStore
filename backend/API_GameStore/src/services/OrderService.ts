@@ -108,11 +108,11 @@ async processPayment(data: PaymentInput) {
 
     // Simu. do Gateway de Pagamento
     let transactionStatus: 'SUCCESS' | 'FAILED' = 'SUCCESS';
-    let gatewayMessage = "Pagamento aprovado pelo gateway simulado.";
+    let gatewayMessage = "Pagamento aprovado. Transação concluída com sucesso.";
 
     if (cardNumber && cardNumber.startsWith('4242')) {
         transactionStatus = 'FAILED';
-        gatewayMessage = "Pagamento rejeitado: Cartão bloqueado/Inválido (Simulação).";
+        gatewayMessage = "Pagamento rejeitado: Cartão bloqueado/Inválido.";
     }
 
     // Cria a Transação, Atualiza o Pedido E ATRIBUIR AS KEYS

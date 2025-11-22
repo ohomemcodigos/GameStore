@@ -3,7 +3,7 @@ export const swaggerOptions = {
     openapi: '3.0.0',
     info: {
       title: 'API de Loja de Jogos',
-      version: '1.0.0',
+      version: '1.1.0',
       description: 'Documentação da API para a loja de jogos online, feita com Express.js e Prisma.',
     },
     servers: [

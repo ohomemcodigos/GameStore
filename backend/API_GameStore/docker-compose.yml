@@ -1,32 +1,58 @@
+version: '3.8'
+
 services:
-  # Nome do serviço (pode ser qualquer um)
+  # ======================================
+  # 1. SERVIÇO DE BANCO DE DADOS (db)
+  # ======================================
   db:
-    # Usa a imagem oficial do PostgreSQL
+    # Nome do serviço (usado como hostname)
     image: postgres:15-alpine
-
-    # Nome do container que será criado
     container_name: banco-postgres-compose
-
-    # Reinicia o container automaticamente em caso de falha
     restart: always
-
-    # Variáveis de ambiente para configurar o banco
+    
+    # Variáveis de ambiente para o container do PostgreSQL
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: adminpass
       POSTGRES_DB: game_store
-
-    # Mapeamento de portas: <host>:<container>
+    
+    # Mapeamento de portas (necessário para acesso local do Prisma Migrate)
     ports:
       - "5432:5432"
-
-    # Mapeamento de volumes
+    
     volumes:
-      # Volume nomeado para persistir os dados do banco
       - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d # Para scripts de inicialização
+  
+  # ======================================
+  # 2. SERVIÇO DA API
+  # ======================================
+  api:
+    # Instruções para construir a imagem usando o Dockerfile no diretório atual
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    container_name: api-gamestore-service # Nome explícito para facilitar o `docker exec`
+    restart: always
+    
+    # Variáveis de ambiente injetadas no contêiner da API
+    environment:
+      DATABASE_URL: postgresql://admin:adminpass@db:5432/game_store 
+      PORT: 3000
+    
+    # Mapeamento de portas para expor a API localmente
+    ports:
+      - "3001:3000" # Mapeia 3001 do PC local para 3000 do container
+      
+    # Mapeamento de volumes para desenvolvimento local
+    volumes:
+      - .:/app # Mapeia o código local para dentro do contêiner
+      - /app/node_modules # Garante que node_modules é ignorado no mapeamento (Melhora a performance)
 
-      # Monta o diretório local `init` dentro do container para executar os scripts
-      - ./init:/docker-entrypoint-initdb.d
+    # Garante que o banco de dados esteja pronto antes de iniciar a API
+    depends_on:
+      - db
 
 # Define os volumes que serão gerenciados pelo Docker
 volumes:
