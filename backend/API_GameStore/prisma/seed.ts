@@ -1,4 +1,3 @@
-// prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { Decimal } from '@prisma/client/runtime/library';
@@ -13,7 +12,10 @@ async function main() {
   const testUserPassword = await bcrypt.hash('senha123', SALT_ROUNDS);
   const user = await prisma.user.upsert({
     where: { email: 'teste@game.com' },
-    update: {}, // Não faz nada se já existir
+    // Se o usuário já existe, atualiza a senha para a nova hash
+    update: {
+      password: testUserPassword
+    },
     create: {
       email: 'teste@game.com',
       name: 'Guilherme Teste',
