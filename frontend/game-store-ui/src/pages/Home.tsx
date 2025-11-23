@@ -29,7 +29,6 @@ export function Home() {
   }
 
   function formatPrice(price: string | number) {
-    // Converte string para número
     
     // Formata para R$
     return new Intl.NumberFormat('pt-BR', {style:
