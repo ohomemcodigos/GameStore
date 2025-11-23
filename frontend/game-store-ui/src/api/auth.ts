@@ -1,6 +1,6 @@
 import api from './config';
 
-// --- INTERFACES (Essenciais para o TypeScript) ---
+// --- INTERFACES ---
 export interface User {
   id: string;
   name: string;
@@ -24,7 +24,7 @@ export interface RegisterPayload {
   password: string;
 }
 
-// --- SERVIÇO ---
+// --- SERVIÇOS ---
 export const authService = {
   async login(data: LoginPayload): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>('/api/users/login', data);
@@ -44,7 +44,6 @@ export const authService = {
   logout(): void {
     localStorage.removeItem('@GameStore:token');
     localStorage.removeItem('@GameStore:user');
-    window.location.href = '/login';
   },
 
   getCurrentUser(): User | null {

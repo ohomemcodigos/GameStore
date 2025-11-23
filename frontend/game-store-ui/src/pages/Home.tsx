@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import { gameService, type Game } from '../api/game'; 
-import { useAuth } from '../context/AuthContext'; 
+import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
+import { CartWidget } from '../components/CartWidget';
 
 export function Home() {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, signOut } = useAuth();
+  const { addToCart } = useCart();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,86 +29,118 @@ export function Home() {
   }
 
   function formatPrice(price: string | number) {
-    const numberPrice = Number(price); // Converte string para número
+    // Converte string para número
     
     // Formata para R$
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(numberPrice);
+    return new Intl.NumberFormat('pt-BR', {style:
+        'currency',
+        currency: 'BRL'
+    }).format(Number(price));
   }
 
-  function handleComprar(gameTitle: string) {
+  function handleAddToCart(game: Game) {
     if (!isAuthenticated) {
-      alert("Você precisa estar logado para comprar!");
+      alert("Faça login para adicionar ao carrinho!");
       navigate('/login');
-    } else {
-      alert(`Iniciando compra de ${gameTitle} para ${user?.name}...`);
+      return;
     }
+    
+    addToCart(game);
   }
 
-  if (loading) {
-    return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Carregando catálogo...</div>;
-  }
+  if (loading) return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Carregando...</div>;
 
   return (
     <div style={{ padding: '2rem', minHeight: '100vh', backgroundColor: '#1a1a1a' }}>
+      
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', color: 'black' }}>
-        <h1>Catálogo de Jogos 🎮</h1>
-        <div>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '2rem',
+        color: 'white', borderBottom:
+        '1px solid #333', paddingBottom:
+        '1rem'
+        }}>
+        <h1>GameStore 🎮</h1>
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px'
+            }}>
+            
+            {/* Ícone do Carrinho ( Aparece apenas se logado) */}
+            {isAuthenticated && <CartWidget />}
+
             {isAuthenticated ? (
-                <span>Olá, {user?.name}</span>
+                // Mensagem de boas-vindas + Botão Sair
+                <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                    <span>Olá, {user?.name}</span>
+                    <button 
+                        onClick={signOut} 
+                        style={{ background: '#e74c3c', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                        Sair
+                    </button>
+                </div>
             ) : (
                 <button onClick={() => navigate('/login')} style={{ padding: '8px 16px', cursor: 'pointer' }}>Login</button>
             )}
         </div>
       </div>
       
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', justifyContent: 'center' }}>
+      {/* Grid de Jogos */}
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '1.5rem',
+        justifyContent: 'center'
+        }}>
         {games.map(game => (
-          <div key={game.id} style={{ 
-            background: '#333', 
-            color: 'white', 
-            padding: '1.5rem', 
+          <div key={game.id} style={{
+            background: '#333',
+            color: 'white',
+            padding: '1.5rem',
             borderRadius: '8px',
             width: '250px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
             boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
-          }}>
-            <div>
-                {/* Imagem do jogo */}
-                <img 
-                    src={game.imageUrl || "https://placehold.co/600x400?text=Game"} 
-                    alt={game.title} 
-                    style={{ width: '100%', borderRadius: '4px', marginBottom: '1rem', objectFit: 'cover', height: '140px' }} 
-                />
-                
-                <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>{game.title}</h3>
-                
-                <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#4ade80' }}>
-                    {formatPrice(game.price)}
-                </p>
-            </div>
+            }}>
+            {/* Imagem do jogo */}
+            <img src={game.imageUrl || "https://placehold.co/600x400?text=Game"} alt={game.title} style={{
+                width: '100%',
+                borderRadius: '4px',
+                marginBottom: '1rem',
+                objectFit: 'cover',
+                height: '140px'
+                }} />
+            <h3 style={{
+                fontSize: '1.1rem',
+                marginBottom: '0.5rem'
+            }}
+            >{game.title}</h3>
+            <p style={{
+                fontSize: '1.2rem',
+                fontWeight: 'bold',
+                color: '#4ade80'
+            }}
+            >{formatPrice(game.price)}</p>
             
-            {/* Botão de comprar */}
+            {/* Botão de Adicionar ao Carrinho */}
             <button 
-                onClick={() => handleComprar(game.title)}
+                onClick={() => handleAddToCart(game)}
                 style={{ 
-                    marginTop: '15px', 
-                    width: '100%', 
-                    padding: '10px', 
-                    cursor: 'pointer',
-                    backgroundColor: isAuthenticated ? '#646cff' : '#555',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    fontWeight: 'bold'
-                }}
+                      marginTop: '15px',
+                      width: '100%',
+                      padding: '10px',
+                      cursor: 'pointer',
+                      backgroundColor: isAuthenticated ? '#f39c12' : '#555',
+                      color: 'white',
+                      border: 'none',borderRadius: '4px',
+                      fontWeight: 'bold'
+                    }}
             >
-              {isAuthenticated ? 'Comprar Agora' : 'Faça Login para Comprar!'}
+              {isAuthenticated ? 'Adicionar ao Carrinho' : 'Login para Comprar'}
             </button>
           </div>
         ))}
