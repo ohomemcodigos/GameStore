@@ -27,7 +27,6 @@ export interface RegisterPayload {
 // --- SERVIÇO ---
 export const authService = {
   async login(data: LoginPayload): Promise<AuthResponse> {
-    // Ajuste a rota conforme seu backend (ex: /api/users/login)
     const response = await api.post<AuthResponse>('/api/users/login', data);
     
     if (response.data.token) {

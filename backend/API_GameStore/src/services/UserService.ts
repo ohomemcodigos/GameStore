@@ -1,6 +1,6 @@
 import { prisma } from "../index";
 import * as bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken'; // <--- NOVA IMPORTAÇÃO
+import jwt from 'jsonwebtoken';
 
 // Defina seus tipos reais
 type UserCreateInput = any; 
@@ -8,7 +8,7 @@ type UserUpdateInput = any;
 type UserLoginInput = { email: string; password: string };
 
 const SALT_ROUNDS = 10;
-const JWT_SECRET = process.env.JWT_SECRET || 'minha_chave_secreta_super_segura'; // <--- CONFIGURAÇÃO DO JWT
+const JWT_SECRET = process.env.JWT_SECRET || 'minha_chave_secreta_super_segura';
 
 export const UserService = {
 
