@@ -15,5 +15,4 @@ export const registerUserSchema = z.object({
 });
 
 // Schema para ATUALIZAR um usuário
-// Usamos .partial() para tornar todos os campos opcionais
 export const updateUserSchema = registerUserSchema.partial();

@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { PrivateRoute } from './components/PrivateRoute';
 import { Login } from './pages/Login';
 import { Home } from './pages/Home';
+import { Register } from './pages/Register';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           {/* Rotas Públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
           {/* Rotas Protegidas */}
           <Route element={<PrivateRoute />}>
