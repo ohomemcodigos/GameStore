@@ -5,6 +5,7 @@ import { PrivateRoute } from './components/PrivateRoute';
 import { Login } from './pages/Login';
 import { Home } from './pages/Home';
 import { Register } from './pages/Register';
+import { Checkout } from './pages/Checkout';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/register" element={<Register />} />
               {/* Rotas Protegidas */}
             <Route element={<PrivateRoute />}>
+            <Route path="/checkout" element={<Checkout />} />
             </Route>
           </Routes>
         </BrowserRouter>

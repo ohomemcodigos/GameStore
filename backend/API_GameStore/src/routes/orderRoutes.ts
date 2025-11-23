@@ -4,6 +4,7 @@ import {
     payOrder,
     getUserOrders,
 } from '../controllers/orderController';
+import { authMiddleware } from '../middlewares/authMiddleware';
 
 const router = Router();
 
@@ -33,8 +34,7 @@ const router = Router();
  *       400:
  *         description: Dados inválidos ou estoque insuficiente.
  */
-router.post('/', createOrder);
-
+router.post('/', authMiddleware, createOrder);
 /**
  * @swagger
  * /api/orders/{orderId}/pay:
@@ -62,7 +62,7 @@ router.post('/', createOrder);
  *       404:
  *         description: Pedido não encontrado.
  */
-router.post('/:orderId/pay', payOrder);
+router.post('/:orderId/pay', authMiddleware, payOrder);
 
 /**
  * @swagger
@@ -83,6 +83,6 @@ router.post('/:orderId/pay', payOrder);
  *       404:
  *         description: Usuário não encontrado.
  */
-router.get('/user/:userId', getUserOrders);
+router.get('/my-orders', authMiddleware, getUserOrders);
 
 export default router;

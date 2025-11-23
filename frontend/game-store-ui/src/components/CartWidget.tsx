@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { orderService } from '../api/order';
 
 export function CartWidget() {
-  const { cart, removeFromCart, total } = useCart();
+  const { cart, removeFromCart, clearCart, total } = useCart();
   const [isOpen, setIsOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate(); // Para uso futuro
   
   // Criamos uma referência para o elemento do carrinho
@@ -30,11 +32,11 @@ export function CartWidget() {
 
   const formatPrice = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
-  const handleCheckout = () => {
-    setIsOpen(false);
-    alert("em desenvolvimento");
-  };
 
+const handleCheckout = () => {
+  setIsOpen(false);
+  navigate('/checkout'); // Redireciona para a página dedicada
+};
   return (
     // Adiciona a ref no container pai
     <div ref={cartRef} style={{ position: 'relative' }}>
@@ -72,7 +74,7 @@ export function CartWidget() {
           backgroundColor: 'white', color: 'black', borderRadius: '8px',
           boxShadow: '0 4px 15px rgba(0,0,0,0.5)', padding: '1rem', zIndex: 1000
         }}>
-          <h4 style={{ borderBottom: '1px solid #eee', paddingBottom: '0.5rem', margin: '0 0 1rem 0' }}>Seu Carrinho</h4>
+          <h4 style={{ borderBottom: '1px solid #eee', paddingBottom: '0.5rem', margin: '0 0 1rem 0' }}>Seu Carrinho</h4> 
           
           {cart.length === 0 ? (
             <p style={{ color: '#666', textAlign: 'center', fontSize: '0.9rem' }}>Carrinho vazio.</p>
@@ -93,6 +95,7 @@ export function CartWidget() {
                       <strong style={{ display: 'block' }}>{item.title}</strong>
                       <span style={{color: '#27ae60'}}>{formatPrice(Number(item.price))}</span>
                     </div>
+                    
                     <button 
                       onClick={() => removeFromCart(item.id)}
                       style={{
@@ -124,19 +127,21 @@ export function CartWidget() {
                   <span>Total:</span>
                   <span style={{ color: '#27ae60' }}>{formatPrice(total)}</span>
                 </div>
-                <button 
+<button 
                   onClick={handleCheckout}
-                  style={{width: '100%',
+                  disabled={isProcessing}
+                  style={{
+                    width: '100%',
                     padding: '10px',
-                    background: '#27ae60',
+                    background: isProcessing ? '#95a5a6' : '#27ae60', // Cinza se carregando, Verde se normal
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',
-                    cursor: 'pointer',
+                    cursor: isProcessing ? 'not-allowed' : 'pointer',
                     fontWeight: 'bold'
                 }}
                 >
-                  Finalizar Compra
+                  {isProcessing ? 'Processando...' : 'Finalizar Compra'}
                 </button>
               </div>
             </>
