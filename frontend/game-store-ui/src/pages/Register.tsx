@@ -58,7 +58,7 @@ export function Register() {
             <input 
               id="email" type="email" required 
               value={email} onChange={e => setEmail(e.target.value)} 
-              placeholder="seu@email.com"
+              placeholder=""
               style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #555', backgroundColor: '#222', color: 'white' }}
             />
           </div>

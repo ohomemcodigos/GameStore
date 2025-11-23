@@ -37,7 +37,7 @@ export const authService = {
   },
 
   async register(data: RegisterPayload): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/api/users', data);
+    const response = await api.post<AuthResponse>('/api/users/register', data);
     return response.data;
   },
 
