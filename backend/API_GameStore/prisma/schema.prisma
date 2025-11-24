@@ -1,0 +1,188 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===================================
+// MODELO 1: JOGO (Game)
+// ===================================
+model Game {
+  id          Int      @id @default(autoincrement())
+  title       String   @unique
+  slug        String   @unique
+//===================================
+  description String?
+  genre       String[]
+  ageRating   String     @default("L")
+  platforms   String[]   @default(["PC"])
+//===================================
+  developer  String[]
+  publisher   String[]
+  releaseDate DateTime
+//===================================
+  price       Decimal
+  discountPrice Decimal?
+//===================================
+  coverUrl    String?
+  isFeatured  Boolean   @default(false)
+//===================================
+  systemRequirements Json?
+//===================================
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+// Relacionamentos
+  items       OrderItem[] // Um jogo está em muitos OrderItems (itens de pedido)
+  licenseKeys LicenseKey[] // Um jogo tem muitas LicenseKeys 
+  wishlist    Wishlist[] // Um jogo pode estar em muitas wishlists
+  reviews     Review[] // Um jogo pode ter muitas avaliações
+  gallery     GameMedia[] // Um jogo pode ter muitas imagens/videos na galeria
+}
+
+// ===================================
+// MODELO 2: MÍDIAS DO JOGO (GameMedia)
+// ===================================
+model GameMedia {
+  id        Int      @id @default(autoincrement())
+  gameId    Int
+  type      String   // "IMAGE" ou "VIDEO"
+  url       String   // URL da imagem ou Link do YouTube
+  
+  // Relacionamento
+  game      Game     @relation(fields: [gameId], references: [id])
+}
+
+// ===================================
+// MODELO 3: USUÁRIO (User)
+// ===================================
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  nickname  String?  @unique // Apelido, deve ser único
+  avatarUrl String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role      Role     @default(USER) // Todo usuário é um USER por padrão
+
+  // Relacionamentos
+  orders Order[] // Um usuário pode ter muitos Orders (pedidos)
+  wishlist    Wishlist[] // Um usuário pode adicionar vários jogos à sua wishlist
+  reviews     Review[] // Um usuário pode ter muitas avaliações
+}
+
+// ===================================
+// MODELO 4: PEDIDO/CARRINHO (Order)
+// ===================================
+model Order {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  status    String   @default("PENDING")
+  total     Decimal
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  user         User          @relation(fields: [userId], references: [id])
+  items        OrderItem[] // Um pedido tem muitos itens
+  transactions Transaction[] // Um pedido pode ter uma ou mais tentativas de pagamento
+}
+
+// ===================================
+// MODELO 5: ITENS DO PEDIDO (OrderItem)
+// ===================================
+model OrderItem {
+  id              Int     @id @default(autoincrement())
+  orderId         Int
+  gameId          Int
+  priceAtPurchase Decimal // Preço que o jogo custava no momento da compra
+  quantity        Int     @default(1)
+
+  // Relacionamentos
+  order      Order       @relation(fields: [orderId], references: [id])
+  game       Game        @relation(fields: [gameId], references: [id])
+  licenseKeys LicenseKey[]
+
+  // Relacionamentos
+  @@unique([orderId, gameId])
+}
+
+// ===================================
+// MODELO 6: TRANSAÇÃO (Transaction)
+// ===================================
+model Transaction {
+  id            Int      @id @default(autoincrement())
+  orderId       Int
+  status        String // Ex: SUCCESS, FAILED, PROCESSING
+  amount        Decimal
+  paymentMethod String // Ex: CREDIT_CARD, PIX
+  gatewayId     String? // ID retornado pelo gateway de pagamento
+  createdAt     DateTime @default(now())
+
+  // Relacionamentos
+  order Order @relation(fields: [orderId], references: [id])
+}
+
+// ===================================
+// MODELO 7: MODELO PARA CHAVES DE LICENÇA (LicenseKey)
+// ===================================
+model LicenseKey {
+  id          Int        @id @default(autoincrement())
+  keyString   String     @unique @db.VarChar(50) // A chave de ativação
+  isUsed      Boolean    @default(false) // TRUE se a chave já foi entregue a um cliente
+  gameId      Int // Relacionamento com o Jogo que esta chave pertence
+  game        Game       @relation(fields: [gameId], references: [id])
+
+  // Relacionamentos
+  orderItemId     Int?
+  orderItem   OrderItem? @relation(fields: [orderItemId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+// ===================================
+// MODELO 8: LISTA DE DESEJOS (Wishlist)
+// ===================================
+model Wishlist {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  gameId    Int
+  createdAt DateTime @default(now())
+
+  // Relacionamentos
+  user User @relation(fields: [userId], references: [id])
+  game Game @relation(fields: [gameId], references: [id])
+
+  @@unique([userId, gameId])
+}
+
+// ===================================
+// MODELO 9: AVALIAÇÃO/REVIEW DOS JOGOS (Review)
+// ===================================
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String?
+  userId    Int
+  gameId    Int
+  createdAt DateTime @default(now())
+
+  // Relacionamentos
+  user User @relation(fields: [userId], references: [id])
+  game Game @relation(fields: [gameId], references: [id])
+}
