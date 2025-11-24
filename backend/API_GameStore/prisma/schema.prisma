@@ -17,14 +17,29 @@ datasource db {
 model Game {
   id          Int      @id @default(autoincrement())
   title       String   @unique
+  slug        String   @unique
+//===================================
   description String?
-  genre       String
+  genre       String[]
+  ageRating   String     @default("L")
+  platforms   String[]   @default(["PC"])
+//===================================
+  developer  String[]
+  publisher   String[]
+  releaseDate DateTime
+//===================================
   price       Decimal
+  discountPrice Decimal?
+//===================================
   coverUrl    String?
-
+  isFeatured  Boolean   @default(false)
+//===================================
+  systemRequirements Json?
+//===================================
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+// Relacionamentos
   items       OrderItem[] // Um jogo está em muitos OrderItems (itens de pedido)
   licenseKeys LicenseKey[] // Um jogo tem muitas LicenseKeys 
   wishlist    Wishlist[] // Um jogo pode estar em muitas wishlists
@@ -41,6 +56,7 @@ model GameMedia {
   type      String   // "IMAGE" ou "VIDEO"
   url       String   // URL da imagem ou Link do YouTube
   
+  // Relacionamento
   game      Game     @relation(fields: [gameId], references: [id])
 }
 
@@ -55,6 +71,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Relacionamentos
   orders Order[] // Um usuário pode ter muitos Orders (pedidos)
   wishlist    Wishlist[] // Um usuário pode adicionar vários jogos à sua wishlist
   reviews     Review[] // Um usuário pode ter muitas avaliações
@@ -92,7 +109,7 @@ model OrderItem {
   game       Game        @relation(fields: [gameId], references: [id])
   licenseKeys LicenseKey[]
 
-  // Essa chave primária garante que cada jogo/pedido é único
+  // Relacionamentos
   @@unique([orderId, gameId])
 }
 
@@ -108,7 +125,7 @@ model Transaction {
   gatewayId     String? // ID retornado pelo gateway de pagamento
   createdAt     DateTime @default(now())
 
-  // Relacionamento
+  // Relacionamentos
   order Order @relation(fields: [orderId], references: [id])
 }
 
@@ -121,7 +138,8 @@ model LicenseKey {
   isUsed      Boolean    @default(false) // TRUE se a chave já foi entregue a um cliente
   gameId      Int // Relacionamento com o Jogo que esta chave pertence
   game        Game       @relation(fields: [gameId], references: [id])
-  // Relacionamento com o Pedido que consumiu esta chave
+
+  // Relacionamentos
   orderItemId     Int?
   orderItem   OrderItem? @relation(fields: [orderItemId], references: [id])
 
@@ -137,6 +155,7 @@ model Wishlist {
   gameId    Int
   createdAt DateTime @default(now())
 
+  // Relacionamentos
   user User @relation(fields: [userId], references: [id])
   game Game @relation(fields: [gameId], references: [id])
 
@@ -154,6 +173,7 @@ model Review {
   gameId    Int
   createdAt DateTime @default(now())
 
+  // Relacionamentos
   user User @relation(fields: [userId], references: [id])
   game Game @relation(fields: [gameId], references: [id])
 }
