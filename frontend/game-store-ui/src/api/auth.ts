@@ -2,10 +2,10 @@ import api from './config';
 
 // --- INTERFACES ---
 export interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
-  isAdmin?: boolean;
+  role: 'ADMIN' | 'USER';
 }
 
 export interface AuthResponse {

@@ -1,13 +1,19 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+
+// Componentes de Proteção
 import { PrivateRoute } from './components/PrivateRoute';
-import { Login } from './pages/Login'; // Pagina de Login
-import { Home } from './pages/Home'; // Pagina Inicial
-import { Register } from './pages/Register'; // Pagina de Registro de Usuario
-import { Checkout } from './pages/Checkout'; // Pagina de Checkout
-import { MyGames } from './pages/myGames'; // Pagina de Biblioteca de Jogos
-import { GameDetails } from './pages/GameDetails'; // Pagina de Detalhes do Jogo
+import { AdminRoute } from './components/AdminRoute';
+
+// Páginas
+import { Login } from './pages/Login'; // de Login
+import { Home } from './pages/Home'; // da Home
+import { Register } from './pages/Register'; // de Registro
+import { Checkout } from './pages/Checkout'; // de Compras
+import { MyGames } from './pages/myGames'; // da Biblioteca
+import { GameDetails } from './pages/GameDetails'; // de Detalhes do Jogo
+import { AdminDashboard } from './pages/admin/Dashboard'; // do Painel Admin
 
 function App() {
   return (
@@ -15,16 +21,24 @@ function App() {
       <CartProvider> 
         <BrowserRouter>
           <Routes>
-              {/* Rotas Públicas */}
+            
+            {/* --- ROTAS PÚBLICAS --- */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/game/:id" element={<GameDetails />} />
-              {/* Rotas Protegidas */}
+            
+            {/* --- ROTAS PROTEGIDAS --- */}
             <Route element={<PrivateRoute />}>
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/my-games" element={<MyGames />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/my-games" element={<MyGames />} />
             </Route>
+
+            {/* --- ROTAS DE ADMIN --- */}
+            <Route element={<AdminRoute />}>
+              <Route path="/admin" element={<AdminDashboard />} />
+            </Route>
+
           </Routes>
         </BrowserRouter>
       </CartProvider>
