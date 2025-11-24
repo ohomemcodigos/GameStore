@@ -1,3 +1,4 @@
+# README DESATUALIZADO
 # 🎮 API de Loja de Jogos 🎮
 
 > Uma API RESTful robusta para gerenciar uma plataforma de venda de jogos online, desenvolvida com Node.js, Express, TypeScript e Prisma.
@@ -143,5 +144,6 @@ model Purchase {
 ```
 # Licença
 Este projeto está sob a licença MIT.
+
 
 
