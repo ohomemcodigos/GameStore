@@ -1,198 +1,145 @@
 import { prisma } from "../index";
 import { Decimal } from '@prisma/client/runtime/library';
 
-// Define a estrutura esperada para a entrada (o carrinho do usuário)
-type ItemInput = { 
-    gameId: number; 
-    quantity: number; 
-};
+// Interfaces simples para entrada de dados
+interface CreateOrderInput {
+    userId: number;
+    gameIds: number[];
+}
 
-type CreateOrderInput = {
-    userId: number; 
-    items: ItemInput[]; 
-};
-
-type PaymentInput = {
+interface ProcessPaymentInput {
     orderId: number;
-    paymentMethod: 'CREDIT_CARD' | 'PIX' | 'BOLETO';
+    paymentMethod: string;
     cardNumber?: string;
-};
+}
 
 export const OrderService = {
 
-async createOrder(data: CreateOrderInput) {
-    const { userId, items } = data;
+    // Criação do Pedido
+    async createOrder(data: CreateOrderInput) {
+        const { userId, gameIds } = data;
 
-    const newOrder = await prisma.$transaction(async (tx) => {
+        return await prisma.$transaction(async (tx) => {
+            
+            // 1. Buscar jogos no banco
+            const games = await tx.game.findMany({
+                where: { id: { in: gameIds } },
+                select: { id: true, price: true, title: true }
+            });
 
-    // Coletar IDs e verificar a existência dos jogos
-    const gameIds = items.map(item => item.gameId);
-    const games = await tx.game.findMany({
-        where: { id: { in: gameIds } },
-        select: { id: true, price: true, title: true }
-    });
-
-    if (games.length !== gameIds.length) {
-        throw new Error("Um ou mais jogos no carrinho não foram encontrados.");
-    }
-
-    // Verificação de Estoque (CHAVES DE LICENÇA)
-    for (const item of items) {
-        // Contar quantas chaves NÃO USADAS existem para o jogo
-        const availableLicenses = await tx.licenseKey.count({
-            where: {
-                gameId: item.gameId,
-                isUsed: false,
+            // Verifica se todos foram encontrados
+            if (games.length !== gameIds.length) {
+                throw new Error("Um ou mais jogos do carrinho não existem.");
             }
-        });
 
-        // Compara o estoque disponível com a quantidade desejada
-        if (availableLicenses < item.quantity) {
-            const gameData = games.find(g => g.id === item.gameId);
-            throw new Error(`Estoque insuficiente para o jogo '${gameData?.title || item.gameId}'. Disponível: ${availableLicenses}, Desejado: ${item.quantity}.`);
-        }
-    }
+            // 2. Calcular Total
+            const totalAmount = games.reduce((sum, game) => {
+                return sum.add(game.price); // Soma Decimal
+            }, new Decimal(0));
 
-    // Calcula total e monta o OrderItems
-    let total = new Decimal(0);
-    const orderItemsData = items.map(item => {
-        const gameData = games.find(g => g.id === item.gameId);
-        const priceAtPurchase = gameData!.price;
-
-        const subtotalItem = priceAtPurchase.mul(item.quantity);
-        total = total.add(subtotalItem);
-
-        return {
-            gameId: item.gameId,
-            priceAtPurchase: priceAtPurchase,
-            quantity: item.quantity,
-        };
-    });
-
-    // Cria o Pedido (Order) e os Itens do Pedido (OrderItem)
-    const newOrder = await prisma.order.create({
-        data: {
-            userId: userId,
-            total: total,
-            status: "PENDING",
-            items: {
-                create: orderItemsData,
-            }
-        },
-        include: {
-            items: true // Inclui os itens para a resposta
-        }
-    });
-
-    return newOrder;
-});
-
-    return newOrder;
-},
-    
-async processPayment(data: PaymentInput) {
-    const { orderId, paymentMethod, cardNumber } = data;
-
-    // Verificar se o pedido existe e está pendente (com os itens incluídos)
-    const order = await prisma.order.findUnique({
-        where: { id: orderId },
-        include: { items: true } // Deve incluir os itens do pedido para atribuir as keys depois
-    });
-
-    if (!order) {
-        throw new Error("Pedido não encontrado.");
-    }
-    if (order.status !== "PENDING") {
-        throw new Error(`O pedido já foi processado com status: ${order.status}.`);
-    }
-
-    // Simu. do Gateway de Pagamento
-    let transactionStatus: 'SUCCESS' | 'FAILED' = 'SUCCESS';
-    let gatewayMessage = "Pagamento aprovado. Transação concluída com sucesso.";
-
-    if (cardNumber && cardNumber.startsWith('4242')) {
-        transactionStatus = 'FAILED';
-        gatewayMessage = "Pagamento rejeitado: Cartão bloqueado/Inválido.";
-    }
-
-    // Cria a Transação, Atualiza o Pedido E ATRIBUIR AS KEYS
-    const newOrderStatus = transactionStatus === 'SUCCESS' ? 'PAID' : 'FAILED';
-
-    const result = await prisma.$transaction(async (tx) => {
-        
-        // Cria o registro da transação
-        const transaction = await tx.transaction.create({
-            data: {
-                orderId: orderId,
-                status: transactionStatus,
-                amount: order.total,
-                paymentMethod: paymentMethod,
-                gatewayId: `SIMULATED-${Date.now()}`,
-            },
-        });
-
-        // Atribui Keys apenas se o pagamento foi bem-sucedido 
-        if (transactionStatus === 'SUCCESS') {
-            for (const item of order.items) {
-                // Seleciona a quantidade necessária de chaves NÃO USADAS
-                const licensesToAssign = await tx.licenseKey.findMany({
-                    where: {
-                        gameId: item.gameId,
-                        isUsed: false,
-                    },
-                    take: item.quantity, // Limita ao número exato de cópias compradas
-                });
-
-                if (licensesToAssign.length !== item.quantity) {
-                    // Isso indica um problema grave de concorrência ou falha no createOrder, 
-                    // mas é crucial verificar novamente.
-                    throw new Error(`Falha crítica de estoque para o item ${item.id}. A transação será revertida.`);
-                }
-
-                // Atualiza as chaves: marca como usada e atribui ao OrderItem
-                await tx.licenseKey.updateMany({
-                    where: {
-                        id: { in: licensesToAssign.map(l => l.id) }
-                    },
-                    data: {
-                        isUsed: true,
-                        orderItemId: item.id, // Liga a chave ao item do pedido
+            // 3. Criar Pedido
+            // Nota: Assumimos quantidade 1 para cada jogo (venda digital)
+            const newOrder = await tx.order.create({
+                data: {
+                    userId,
+                    total: totalAmount,
+                    status: "PENDING",
+                    items: {
+                        create: games.map(game => ({
+                            gameId: game.id,
+                            quantity: 1,
+                            priceAtPurchase: game.price
+                        }))
                     }
-                });
-            }
-        }
+                },
+                include: { items: true }
+            });
 
-        // Atualiza o status do pedido
-        const updatedOrder = await tx.order.update({
+            return newOrder;
+        });
+    },
+
+    // Processamento do Pagamento
+    async processPayment(data: ProcessPaymentInput) {
+        const { orderId, paymentMethod, cardNumber } = data;
+
+        const order = await prisma.order.findUnique({
             where: { id: orderId },
-            data: { 
-                status: newOrderStatus, 
-                updatedAt: new Date()
-            },
+            include: { items: true }
         });
 
-        return { transaction, updatedOrder, gatewayMessage };
-    });
+        if (!order) throw new Error("Pedido não encontrado.");
+        if (order.status !== "PENDING") throw new Error("Pedido já processado.");
 
-    return result;
-},
-    
+        // Simulação de Gateway
+        let status = 'SUCCESS';
+        let gatewayMsg = "Pagamento aprovado.";
+
+        if (paymentMethod === 'CREDIT_CARD' && cardNumber?.startsWith('4242')) {
+            status = 'FAILED';
+            gatewayMsg = "Pagamento recusado.";
+        }
+
+        return await prisma.$transaction(async (tx) => {
+            // 1. Cria Transação
+            const transaction = await tx.transaction.create({
+                data: {
+                    orderId,
+                    amount: order.total,
+                    status,
+                    paymentMethod,
+                    gatewayId: `TX-${Date.now()}`
+                }
+            });
+
+            // 2. Se aprovado, consome as chaves
+            if (status === 'SUCCESS') {
+                for (const item of order.items) {
+                    // Busca 1 chave disponível
+                    const key = await tx.licenseKey.findFirst({
+                        where: { gameId: item.gameId, isUsed: false }
+                    });
+
+                    // Se não tiver chave, falha a transação inteira (segurança de estoque)
+                    if (!key) {
+                        throw new Error(`Estoque esgotado para o jogo ID ${item.gameId}.`);
+                    }
+
+                    // Marca como usada
+                    await tx.licenseKey.update({
+                        where: { id: key.id },
+                        data: { isUsed: true, orderItemId: item.id }
+                    });
+                }
+            }
+
+            // 3. Atualiza Pedido
+            const updatedOrder = await tx.order.update({
+                where: { id: orderId },
+                data: { 
+                    status: status === 'SUCCESS' ? 'PAID' : 'FAILED',
+                    updatedAt: new Date()
+                }
+            });
+
+            return { transaction, updatedOrder, gatewayMessage: gatewayMsg };
+        });
+    },
+
+    // Listar Pedidos do Usuário
     async getUserOrders(userId: number) {
-        const orders = await prisma.order.findMany({
-            where: { userId: userId },
-            orderBy: { createdAt: 'desc' }, 
+        return await prisma.order.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
             include: {
                 items: {
                     include: {
-                        game: {
-                            select: { title: true, genre: true } 
-                        }
+                        // Inclui dados do jogo para exibir na lista "Meus Jogos"
+                        game: { select: { title: true, coverUrl: true } }
                     }
                 },
-                transactions: true,
+                transactions: true
             }
         });
-
-        return orders;
-    },
+    }
 };

@@ -1,118 +1,100 @@
 import { Request, Response } from 'express';
-import { ZodError } from 'zod'; // Importando o type do erro do Zod
+import { ZodError } from 'zod';
 import { registerUserSchema, updateUserSchema } from '../validators/userValidator';
 import { UserService } from '../services/UserService';
 
+export const userController = {
 
-/* -- Montando CRUD o userRoutes -- */
+    // POST: Registro
+    async register(req: Request, res: Response) {
+        try {
+            const validatedData = registerUserSchema.parse(req.body); 
+            const newUser = await UserService.register(validatedData);
+            return res.status(201).json(newUser);
 
-// POST
-// Novo usuário
-export const registerUser = async (req: Request, res: Response) => {
-    try {
-        // Validação (Zod garante que os campos obrigatórios estão presentes)
-        const validatedData = registerUserSchema.parse(req.body); 
-        
-        // Chamando o Service para verificar existência e criptografar a senha
-        const newUser = await UserService.register(validatedData);
-
-        res.status(201).json(newUser); // Sucesso!
-
-    } catch (error) {
-        if (error instanceof ZodError) {
-            return res.status(400).json({ error: "Dados de registro inválidos", details: error.issues }); // Falha...
+        } catch (error) {
+            if (error instanceof ZodError) {
+                return res.status(400).json({ error: "Dados inválidos", details: error.issues });
+            }
+            if (error instanceof Error && error.message.includes("cadastrado")) {
+                return res.status(409).json({ error: error.message });
+            }
+            return res.status(500).json({ error: "Erro ao cadastrar usuário." });
         }
-        // Tratamento do erro lançado pelo Service (email já existe)
-        if (error instanceof Error && error.message.includes("email já foi cadastrado")) {
-            return res.status(409).json({ error: error.message }); // Falha...
+    },
+
+    // POST: Login
+    async login(req: Request, res: Response) {
+        try {
+            const { email, password } = req.body;
+
+            if (!email || !password) {
+                return res.status(400).json({ error: "Email e senha são obrigatórios." });
+            }
+            
+            const result = await UserService.login({ email, password });
+
+            if (!result) {
+                return res.status(401).json({ error: "Credenciais inválidas." });
+            }
+
+            return res.status(200).json(result);
+
+        } catch (error) {
+            return res.status(500).json({ error: "Erro ao realizar login." });
         }
-        res.status(500).json({ error: "Erro ao cadastrar o usuário." }); // Falha...
-    }
-};
+    },
 
-// POST
-// Login
-export const loginUser = async (req: Request, res: Response) => {
-    try {
-        const { email, password } = req.body;
+    // GET: User por ID
+    async getById(req: Request, res: Response) {
+        try {
+            const id = parseInt(req.params.id);
+            const user = await UserService.findById(id);
+            
+            if (!user) {
+                return res.status(404).json({ error: "Usuário não encontrado." });
+            }
+            return res.status(200).json(user);
 
-        if ( !email || !password ) {
-            return res.status(400).json({ error: "Os Campos de E-mail e de senha são obrigatórios." }); // Falha...
+        } catch (error) {
+            return res.status(500).json({ error: "Erro ao buscar usuário." });
         }
-        
-        // Chamando o Service para encontrar usuário e comparar a senha criptografada
-        const user = await UserService.login({ email, password });
+    },
 
-        // Se o Service retornar null, as credenciais são inválidas
-        if(!user) {
-            return res.status(401).json({ error: "As suas credenciais são inválidas." }); // Falha...
+    // PUT: Update
+    async update(req: Request, res: Response) {
+        try {
+            const id = parseInt(req.params.id);
+            const validatedData = updateUserSchema.parse(req.body);
+
+            const updatedUser = await UserService.update(id, validatedData);
+            
+            return res.status(200).json(updatedUser);
+
+        } catch (error) {
+            if (error instanceof ZodError) {
+                return res.status(400).json({ error: "Dados inválidos", details: error.issues });
+            }
+            // Erro do Prisma (P2025 = Not Found)
+            if ((error as any).code === "P2025") {
+                return res.status(404).json({ error: "Usuário não encontrado." });
+            }
+            return res.status(500).json({ error: "Erro ao atualizar usuário." });
         }
+    },
 
-        res.status(200).json(user); // Sucesso!
+    // DELETE
+    async delete(req: Request, res: Response) {
+        try {
+            const id = parseInt(req.params.id);
+            await UserService.delete(id);
+            return res.status(204).send();
 
-    }catch (error) {
-        res.status(500).json({ error: "Erro ao realizar Login." }); // Falha...
-    }
-};
-
-// GET
-// Usuário por ID
-export const getUserById = async (req: Request, res: Response) => {
-    try {
-        const id = parseInt(req.params.id);
-        
-        // Chamando o Service para buscar e remover a senha
-        const user = await UserService.findById(id);
-        
-        if (!user){
-            return res.status(404).json({ error: "Usuário não encontrado." }); // Falha...
+        } catch (error) {
+            if ((error as any).code === "P2025") {
+                return res.status(404).json({ error: "Usuário não encontrado." });
+            }
+            return res.status(500).json({ error: "Erro ao deletar usuário." });
         }
-
-        res.status(200).json(user); // Sucesso!
-
-    }catch(error) {
-        res.status(500).json({ error: "Erro ao buscar usuário." }); // Falha...
-    }
-};
-
-// PUT
-// Atualizar user
-export const updateUser = async (req: Request, res: Response) => {
-    try{
-        const id = parseInt(req.params.id);
-        const validatedData = updateUserSchema.parse(req.body);
-
-        // Chamando o Service para atualizar (e criptografar nova senha, se houver)
-        const updatedUser = await UserService.update(id, validatedData);
-        
-        res.status(200).json(updatedUser);
-
-    } catch (error) {
-        if (error instanceof ZodError) {
-            return res.status(400).json({ error: "Dados de atualização inválidos", details: error.issues }); // Falha...
-        }
-        if (typeof error === 'object' && error !== null && 'code' in error && error.code === "P2025") {
-            return res.status(404).json({ error: "Usuário não encontrado para ser atualizado." }); // Falha...
-        }
-        res.status(500).json({ error: "Erro ao atualizar usuário." }); // Falha...
-    }
-};
-
-// DELETE
-// Usuário
-export const deleteUser = async (req: Request, res: Response) => {
-    try {
-        const id = parseInt(req.params.id);
-        
-        // Chamando o Service para deletar
-        await UserService.delete(id);
-
-        res.status(204).send(); // Sucesso, sem conteúdo
-
-    } catch (error) {
-        if (typeof error === 'object' && error !== null && 'code' in error && error.code === "P2025") {
-            return res.status(404).json({ error: "Usuário não encontrado para ser deletado." }); // Falha...
-        }
-        res.status(500).json({ error: "Erro ao deletar usuário." }); // Falha...
     }
 };

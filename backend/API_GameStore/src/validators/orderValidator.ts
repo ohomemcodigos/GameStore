@@ -11,24 +11,23 @@ export const orderItemSchema = z.object({
         .min(1, "A quantidade deve ser pelo menos 1.") // Garante que a quantidade seja pelo menos 1
 });
 
-// Esquema de validação para criação de pedido
+// Validação para criação do pedido
 export const createOrderSchema = z.object({
-    userId: z.number()
-        .int("O ID do usuário deve ser um número inteiro positivo.") // Garante que o ID do usuário seja inteiro
-        .positive("O ID do usuário deve ser positivo."), // Garante que o ID do usuário seja positivo
-
-    items: z.array(orderItemSchema)
-        .min(1, "O pedido deve conter pelo menos um item.") // Garante que o pedido tenha pelo menos um item
+        gameIds: z.array(
+        z.number()
+         .int()
+         .positive()
+        ).min(1, "O carrinho não pode estar vazio"),
 });
 
-// Esquema de validação para pagamento de pedido
+// Validação para Pagamento
 export const payOrderSchema = z.object({
-    paymentMethod: z.enum(['CREDIT_CARD', 'PIX', 'BOLETO'], {
-        error: "O método de pagamento deve ser 'CREDIT_CARD', 'PIX' ou 'BOLETO'."
-    }), // Garante que o método de pagamento seja válido
+    paymentMethod: z.enum(['CREDIT_CARD', 'PIX', 'BOLETO']),
+    error: "O método de pagamento deve ser 'CREDIT_CARD', 'PIX' ou 'BOLETO'.",
     
-    cardNumber: z.string().optional() 
-        .refine(value => !value || (value.length >= 13 && value.length <= 16), {
-            message: "Se fornecido, o número do cartão deve ter entre 13 e 16 dígitos."
-        }) // Valida o número do cartão se fornecido
+    cardNumber: z.string()
+        .min(13, "Cartão inválido")
+        .max(16, "Cartão inválido")
+        .optional()
+        .or(z.literal('')), 
 });

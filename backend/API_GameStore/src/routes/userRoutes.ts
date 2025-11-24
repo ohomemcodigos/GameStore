@@ -1,11 +1,5 @@
 import { Router } from 'express';
-import { 
-  registerUser,
-  loginUser,
-  getUserById,
-  updateUser,
-  deleteUser,
-} from '../controllers/userController';
+import { userController } from '../controllers/userController';
 
 const router = Router();
 
@@ -47,7 +41,7 @@ const router = Router();
  *       409:
  *         description: E-mail já está em uso
  */
-router.post('/register', registerUser);
+router.post('/register', userController.register);
 
 /**
  * @swagger
@@ -77,7 +71,7 @@ router.post('/register', registerUser);
  *       401:
  *         description: Credenciais inválidas
  */
-router.post('/login', loginUser);
+router.post('/login', userController.login);
 
 /**
  * @swagger
@@ -110,7 +104,7 @@ router.post('/login', loginUser);
  *       404:
  *         description: Usuário não encontrado
  */
-router.get('/:id', getUserById);
+router.get('/:id', userController.getById);
 
 /**
  * @swagger
@@ -146,7 +140,7 @@ router.get('/:id', getUserById);
  *       404:
  *         description: Usuário não encontrado
  */
-router.put('/:id', updateUser);
+router.put('/:id', userController.update);
 
 /**
  * @swagger
@@ -167,6 +161,6 @@ router.put('/:id', updateUser);
  *       404:
  *         description: Usuário não encontrado
  */
-router.delete('/:id', deleteUser);
+router.delete('/:id', userController.delete);
 
 export default router;

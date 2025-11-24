@@ -2,10 +2,16 @@ import { prisma } from "../index";
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-// Defina seus tipos reais
-type UserCreateInput = any; 
-type UserUpdateInput = any;
-type UserLoginInput = { email: string; password: string };
+interface UserCreateInput {
+    name: string;
+    email: string;
+    password: string;
+}
+
+interface UserLoginInput {
+    email: string;
+    password: string;
+}
 
 const SALT_ROUNDS = 10;
 const JWT_SECRET = process.env.JWT_SECRET || 'minha_chave_secreta_super_segura';
@@ -25,34 +31,31 @@ export const UserService = {
             data: {
                 ...data,
                 password: hashedPassword, 
+                // role: 'USER'
             },
         });
         
         const { password: _, ...userWithoutPassword } = newUser;
-
         return userWithoutPassword;
     },
 
     // POST: Login
     async login({ email, password }: UserLoginInput) {
-        // Encontrando o usuário
         const user = await prisma.user.findUnique({ where: { email } });
 
         if (!user) return null; 
 
-        // Comparaçãp da senha
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
         if (!isPasswordCorrect) return null; 
 
-        // Sucesso: Prepara o usuário sem senha
         const { password: _, ...userWithoutPassword } = user;
 
-        // Gera o Token JWT 
+        // Gera Token JWT incluindo a ROLE
         const token = jwt.sign(
-            { id: user.id }, // payload
-            JWT_SECRET,      // A chave secreta para assinar
-            { expiresIn: '1d' } // Opções do token (expiração de 1 dia)
+            { id: user.id, role: user.role }, 
+            JWT_SECRET,      
+            { expiresIn: '1d' } 
         );
 
         return {
@@ -70,7 +73,7 @@ export const UserService = {
     },
     
     // PUT: Update
-    async update(id: number, data: UserUpdateInput) {
+    async update(id: number, data: Partial<UserCreateInput>) {
         if (data.password) {
             data.password = await bcrypt.hash(data.password, SALT_ROUNDS);
         }
@@ -84,9 +87,6 @@ export const UserService = {
 
     // DELETE
     async delete(id: number) {
-        // A exclusão no prisma usa o tratamento de erro P2025 no controller
-        await prisma.user.delete({
-            where: { id },
-        });
+        await prisma.user.delete({ where: { id } });
     }
 };

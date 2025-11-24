@@ -5,6 +5,15 @@ import { Prisma } from "@prisma/client";
 type CreateGameData = any; 
 type UpdateGameData = any;
 
+// Função auxiliar para criar slugs a partir do título
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
+    .replace(/[^\w\s-]/g, "") // Remove caracteres especiais
+    .replace(/\s+/g, "-"); // Troca espaços por traços
+}
+
 interface CreateGameDTO {
   title: string;
   slug: string;
@@ -13,9 +22,9 @@ interface CreateGameDTO {
   platforms: string[];
   developer: string[];
   publisher: string[];
-  releaseDate: string; // Vem como string do JSON
+  releaseDate: Date; // Já vem convertido pelo Zod
   price: number | string;
-  discountPrice?: number | string | null;
+  discountPrice?: number | null;
   coverUrl?: string;
   isFeatured?: boolean;
   systemRequirements?: any;
@@ -32,39 +41,53 @@ export const GameService = {
     async findById(id: number) {
         return await prisma.game.findUnique({
             where: { id },
-            include: { gallery: true }
+            include: { gallery: true, reviews: true }
         });
     },
 
     // Criar um novo jogo
-    async create(data: CreateGameData) {
-        return await prisma.game.create({
-            data: {
-                ...data,
-                releaseDate: new Date(data.releaseDate),
-                price: new Prisma.Decimal(data.price),
-                discountPrice: data.discountPrice ? new Prisma.Decimal(data.discountPrice) : null,
-            }
-        });
-    },
+    async create(data: CreateGameDTO) {
+    // Se não mandou slug, gera a partir do título
+    const finalSlug = data.slug || generateSlug(data.title);
 
-    // Atualizar um jogo existente
-    async update(id: number, data: UpdateGameData) {
-        return await prisma.game.update({
-            where: { id },
-            data: {
-                ...data,
-                releaseDate: data.releaseDate ? new Date(data.releaseDate) : undefined,
-                price: data.price ? new Prisma.Decimal(data.price) : undefined,
-                discountPrice: data.discountPrice ? new Prisma.Decimal(data.discountPrice) : null,
-            }
-        });
-    },
-
-    // Deletar um jogo existente
-    async delete(id: number) {
-        return await prisma.game.delete({
-            where: { id },
-        });
+    // Verifica se o slug já existe
+    const existingSlug = await prisma.game.findUnique({ where: { slug: finalSlug } });
+    if (existingSlug) {
+      throw new Error("Já existe um jogo com este título/slug.");
     }
+
+    return await prisma.game.create({
+      data: {
+        ...data,
+        slug: finalSlug,
+      }
+    });
+  },
+
+  // Atualizar um jogo
+  async update(id: number, data: Partial<CreateGameDTO>) {
+    // Se mudou o título e não mandou slug, regera o slug
+    let newSlug = data.slug;
+    if (data.title && !newSlug) {
+        newSlug = generateSlug(data.title);
+    }
+
+    return await prisma.game.update({
+      where: { id },
+      data: {
+        ...data,
+        slug: newSlug || undefined
+      }
+    });
+  },
+
+  // Deletar um jogo
+  async delete(id: number) {
+    // Primeiro apaga as dependências para não dar erro de chave estrangeira
+    await prisma.gameMedia.deleteMany({ where: { gameId: id } });
+    
+    return await prisma.game.delete({
+      where: { id }
+    });
+  }
 };
