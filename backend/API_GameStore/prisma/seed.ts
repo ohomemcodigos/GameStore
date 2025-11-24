@@ -14,12 +14,14 @@ async function main() {
     where: { email: 'teste@game.com' },
     // Se o usuário já existe, atualiza a senha para a nova hash
     update: {
-      password: testUserPassword
+      password: testUserPassword,
+      role: 'ADMIN',
     },
     create: {
       email: 'teste@game.com',
       name: 'Guilherme Teste',
       password: testUserPassword,
+      role: 'ADMIN', // ADMIN role para o usuário de teste
     },
   });
   console.log(`Usuário de teste criado com ID: ${user.id}`);

@@ -63,6 +63,12 @@ model GameMedia {
 // ===================================
 // MODELO 3: USUÁRIO (User)
 // ===================================
+
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -70,6 +76,7 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  role      Role     @default(USER) // Todo usuário é um USER por padrão
 
   // Relacionamentos
   orders Order[] // Um usuário pode ter muitos Orders (pedidos)
