@@ -2,12 +2,23 @@ import api from './config';
 
 // Interface de retorno do Prisma
 export interface Game {
-  id: string | number; // O Prisma pode usar Int ou UUID, aceita ambos por segurança
-  title: string;
+  id:           string | number;
+  title:        string;
+  slug:         string;
   description?: string;
-  price: string | number; // O backend pode retornar string (Decimal) ou number
-  imageUrl?: string;
-  genre?: string;
+  
+  genre:       string[];
+  platforms:   string[];
+  ageRating:   string;
+
+  developer:   string[];
+  publisher:   string[]; 
+  
+  releaseDate: string;
+  price:       string | number;
+  discountPrice?: string | number;
+  coverUrl?:   string;
+  isFeatured:  boolean;
 }
 
 export const gameService = {

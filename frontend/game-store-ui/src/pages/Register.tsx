@@ -103,7 +103,7 @@ export function Register() {
 
         {/* Link para voltar ao Login */}
         <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem' }}>
-          <p>Já tem uma conta? <Link to="/login" style={{ color: '#646cff', textDecoration: 'none' }}>Faça Login</Link></p>
+          <p>Já tem uma conta? <Link to="/login" style={{ color: '#646cff', textDecoration: 'none' }}>Inicie sua sessão!</Link></p>
         </div>
       </div>
     </div>

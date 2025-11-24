@@ -28,22 +28,22 @@ export function Home() {
     }
   }
 
+  // Formata para R$ BRL
   function formatPrice(price: string | number) {
-    
-    // Formata para R$
-    return new Intl.NumberFormat('pt-BR', {style:
+    const numberPrice = Number(price);
+    if (isNaN(numberPrice)) return "R$ 0,00";
+    return new Intl.NumberFormat('pt-BR', 
+      {style:
         'currency',
         currency: 'BRL'
-    }).format(Number(price));
+      }).format(Number(price));
   }
 
   function handleAddToCart(game: Game) {
     if (!isAuthenticated) {
-      alert("Faça login para adicionar ao carrinho!");
-      navigate('/login');
+      alert("Inicie a sessão para adicionar ao carrinho!");
       return;
     }
-    
     addToCart(game);
   }
 
@@ -73,9 +73,19 @@ export function Home() {
             {isAuthenticated && <CartWidget />}
 
             {isAuthenticated ? (
-                // Mensagem de boas-vindas + Botão Sair
+                // Menu Logado
+                // Mensagem de boas-vindas, Biblioteca e Botão Sair
                 <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+
+                    <button 
+                      onClick={() => navigate('/my-games')} 
+                      style={{ background: 'transparent', color: '#ccc', border: '1px solid #555', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                        Meus Jogos
+                    </button>
+
                     <span>Olá, {user?.name}</span>
+                    
                     <button 
                         onClick={signOut} 
                         style={{ background: '#e74c3c', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
@@ -84,7 +94,7 @@ export function Home() {
                     </button>
                 </div>
             ) : (
-                <button onClick={() => navigate('/login')} style={{ padding: '8px 16px', cursor: 'pointer' }}>Login</button>
+                <button onClick={() => navigate('/login')} style={{ padding: '8px 16px', cursor: 'pointer' }}>Inicie sua sessão</button>
             )}
         </div>
       </div>
@@ -96,6 +106,7 @@ export function Home() {
         gap: '1.5rem',
         justifyContent: 'center'
         }}>
+
         {games.map(game => (
           <div key={game.id} style={{
             background: '#333',
@@ -103,29 +114,68 @@ export function Home() {
             padding: '1.5rem',
             borderRadius: '8px',
             width: '250px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
+            boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
             }}>
-            {/* Imagem do jogo */}
-            <img src={game.imageUrl || "https://placehold.co/600x400?text=Game"} alt={game.title} style={{
-                width: '100%',
-                borderRadius: '4px',
-                marginBottom: '1rem',
-                objectFit: 'cover',
-                height: '140px'
-                }} />
-            <h3 style={{
-                fontSize: '1.1rem',
-                marginBottom: '0.5rem'
-            }}
-            >{game.title}</h3>
-            <p style={{
-                fontSize: '1.2rem',
-                fontWeight: 'bold',
-                color: '#4ade80'
-            }}
-            >{formatPrice(game.price)}</p>
+
+            <div>
+                {/* Imagem do Jogo */}
+                <img 
+                    src={game.coverUrl || "https://placehold.co/600x400?text=Game"} 
+                    alt={game.title} 
+                    onClick={() => navigate(`/game/${game.id}`)} // Navegação
+                    style={{
+                        width: '100%',
+                        borderRadius: '4px',
+                        marginBottom: '1rem',
+                        objectFit: 'cover',
+                        height: '140px',
+                        cursor: 'pointer'
+                    }} 
+                />
+                
+                {/* Badge das Plataformas */}
+                <div style={{ marginBottom: '8px', display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                    {game.platforms && game.platforms.map((plat, index) => (
+                        <span key={index} style={{ 
+                            fontSize: '0.65rem', 
+                            textTransform: 'uppercase', 
+                            background: '#444', 
+                            color: '#ccc', 
+                            padding: '2px 6px', 
+                            borderRadius: '4px',
+                            fontWeight: 'bold'
+                        }}>
+                            {plat}
+                        </span>
+                    ))}
+                </div>
+
+                {/* Título e Preço */}
+                <h3 
+                    onClick={() => navigate(`/game/${game.id}`)}
+                    style={{
+                        fontSize: '1.1rem',
+                        marginBottom: '0.5rem',
+                        marginTop: 0,
+                        cursor: 'pointer'
+                    }}
+                >
+                    {game.title}
+                </h3>
+
+                <p style={{
+                    fontSize: '1.2rem',
+                    fontWeight: 'bold',
+                    color: '#4ade80',
+                    margin: '10px 0'
+                }}
+                >{formatPrice(game.price)}</p>
+            </div>
             
-            {/* Botão de Adicionar ao Carrinho */}
+            {/* Botão de Carrinho */}
             <button 
                 onClick={() => handleAddToCart(game)}
                 style={{ 
@@ -139,7 +189,7 @@ export function Home() {
                       fontWeight: 'bold'
                     }}
             >
-              {isAuthenticated ? 'Adicionar ao Carrinho' : 'Login para Comprar'}
+              {isAuthenticated ? 'Adicionar ao Carrinho' : 'Inicie a sessão para Comprar'}
             </button>
           </div>
         ))}
