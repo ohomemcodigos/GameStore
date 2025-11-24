@@ -6,6 +6,7 @@ export function Register() {
   const navigate = useNavigate();
   
   const [name, setName] = useState('');
+  const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
@@ -18,17 +19,15 @@ export function Register() {
     setLoading(true);
 
     try {
-      // Envia os dados para a API
-      await authService.register({ name, email, password });
+      await authService.register({ name, nickname, email, password });
       
       alert('Conta criada com sucesso! Faça login para continuar.');
-      navigate('/login'); // Redireciona para o login
+      navigate('/login');
       
     } catch (err: any) {
       console.error(err);
-      // Tenta pegar a mensagem de erro do backend
       const backendError = err.response?.data?.error;
-      setError(backendError || 'Erro ao criar conta. Tente outro email.');
+      setError(backendError || 'Erro ao criar conta.');
     } finally {
       setLoading(false);
     }
@@ -41,13 +40,24 @@ export function Register() {
         
         <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           
-          {/* Nome */}
+          {/* Nome Real */}
           <div>
             <label htmlFor="name" style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Nome Completo</label>
             <input 
               id="name" type="text" required 
               value={name} onChange={e => setName(e.target.value)} 
               placeholder=""
+              style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #555', backgroundColor: '#222', color: 'white' }}
+            />
+          </div>
+
+          {/* Apelido */}
+          <div>
+            <label htmlFor="nickname" style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Apelido (Nickname)</label>
+            <input 
+              id="nickname" type="text" required 
+              value={nickname} onChange={e => setNickname(e.target.value)} 
+              placeholder="Nome de Tela"
               style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #555', backgroundColor: '#222', color: 'white' }}
             />
           </div>
@@ -67,30 +77,28 @@ export function Register() {
           <div>
             <label htmlFor="password" style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Senha</label>
             <input 
-                id="password" 
-                type="password" 
-                required 
-                minLength={6}
-                value={password} 
-                onChange={e => setPassword(e.target.value)} 
-                placeholder="Mínimo de 6 caracteres"
-                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #555', backgroundColor: '#222', color: 'white' }}
+              id="password" type="password" required minLength={6}
+              value={password} onChange={e => setPassword(e.target.value)} 
+              placeholder="Mínimo de 6 caracteres"
+              style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #555', backgroundColor: '#222', color: 'white' }}
             />
           </div>
 
           {/* Mensagem de Erro */}
-          {error && <div style={{ color: '#ff6b6b', fontSize: '0.9rem', textAlign: 'center', background: 'rgba(255,0,0,0.1)', padding: '5px', borderRadius: '4px' }}>{error}</div>}
+          {error && <div style={{ color: '#ff6b6b',
+            fontSize: '0.9rem',
+            textAlign: 'center',
+            background: 'rgba(255,0,0,0.1)',
+            padding: '5px',
+            borderRadius: '4px'
+            }}>{error}</div>}
 
           {/* Botão Registrar */}
           <button 
-            type="submit" 
-            disabled={loading}
+            type="submit" disabled={loading}
             style={{ 
-              padding: '12px', 
-              backgroundColor: loading ? '#555' : '#27ae60', 
-              color: 'white', 
-              border: 'none', 
-              borderRadius: '4px', 
+              padding: '12px', backgroundColor: loading ? '#555' : '#27ae60', 
+              color: 'white', border: 'none', borderRadius: '4px', 
               cursor: loading ? 'not-allowed' : 'pointer',
               fontWeight: 'bold',
               fontSize: '1rem',

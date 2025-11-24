@@ -92,7 +92,11 @@ export function Home() {
                         Meus Jogos
                     </button>
 
-                    <span>Olá, {user?.name}</span>
+                    <span onClick={() => navigate('/profile')} 
+                        style={{ cursor: 'pointer', fontWeight: 'bold', textDecoration: 'underline' }}
+                    >
+                      {user?.nickname || user?.name}
+                    </span>
                     
                     <button 
                         onClick={signOut} 

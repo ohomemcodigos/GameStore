@@ -15,6 +15,7 @@ import { MyGames } from './pages/myGames'; // da Biblioteca
 import { GameDetails } from './pages/GameDetails'; // de Detalhes do Jogo
 import { AdminDashboard } from './pages/admin/Dashboard'; // do Painel Admin
 import { Wishlist } from './pages/Wishlist'; // da Wishlist
+import { Profile } from './pages/Profile'; // do Perfil do Usuário
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/my-games" element={<MyGames />} />
               <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/profile" element={<Profile />} />
             </Route>
 
             {/* --- ROTAS DE ADMIN --- */}

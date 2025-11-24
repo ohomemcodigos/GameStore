@@ -4,8 +4,10 @@ import api from './config';
 export interface User {
   id: number;
   name: string;
+  nickname?: string;
   email: string;
   role: 'ADMIN' | 'USER';
+  avatarUrl?: string;
 }
 
 export interface AuthResponse {
@@ -20,6 +22,7 @@ export interface LoginPayload {
 
 export interface RegisterPayload {
   name: string;
+  nickname: string;
   email: string;
   password: string;
 }
