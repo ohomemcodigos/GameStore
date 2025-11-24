@@ -21,7 +21,7 @@ export const OrderService = {
 
         return await prisma.$transaction(async (tx) => {
             
-            // 1. Buscar jogos no banco
+            // Buscar jogos no banco
             const games = await tx.game.findMany({
                 where: { id: { in: gameIds } },
                 select: { id: true, price: true, title: true }
@@ -32,12 +32,12 @@ export const OrderService = {
                 throw new Error("Um ou mais jogos do carrinho não existem.");
             }
 
-            // 2. Calcular Total
+            // Calcular Total
             const totalAmount = games.reduce((sum, game) => {
                 return sum.add(game.price); // Soma Decimal
             }, new Decimal(0));
 
-            // 3. Criar Pedido
+            // Criar Pedido
             // Nota: Assumimos quantidade 1 para cada jogo (venda digital)
             const newOrder = await tx.order.create({
                 data: {
@@ -81,7 +81,7 @@ export const OrderService = {
         }
 
         return await prisma.$transaction(async (tx) => {
-            // 1. Cria Transação
+            // Cria Transação
             const transaction = await tx.transaction.create({
                 data: {
                     orderId,
@@ -92,7 +92,7 @@ export const OrderService = {
                 }
             });
 
-            // 2. Se aprovado, consome as chaves
+            // Se aprovado, consome as chaves
             if (status === 'SUCCESS') {
                 for (const item of order.items) {
                     // Busca 1 chave disponível
@@ -113,7 +113,7 @@ export const OrderService = {
                 }
             }
 
-            // 3. Atualiza Pedido
+            // Atualiza Pedido
             const updatedOrder = await tx.order.update({
                 where: { id: orderId },
                 data: { 

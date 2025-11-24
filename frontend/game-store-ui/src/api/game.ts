@@ -32,6 +32,12 @@ export const gameService = {
     return response.data;
   },
 
+  // Busca jogo por ID
+  async getById(id: string | number): Promise<Game> {
+    const response = await api.get<Game>(`/api/games/${id}`);
+    return response.data;
+  },
+
   // Criar (Admin)
   async create(data: CreateGameDTO): Promise<Game> {
     const response = await api.post<Game>('/api/games', data);

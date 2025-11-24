@@ -10,6 +10,7 @@ import { swaggerOptions } from '../config/swaggerOptions'; //Configuração do S
 import gameRoutes from './routes/gameRoutes';
 import userRoutes from './routes/userRoutes';
 import orderRoutes from './routes/orderRoutes';
+import wishlistRoutes from './routes/wishlistRoutes';
 
 // Inicialização do app e do Prisma
 const app = express();
@@ -33,6 +34,7 @@ app.get('/', (req, res) => {
 app.use('/api/games', gameRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // Inicia o servidor
 app.listen(port, () => {

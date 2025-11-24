@@ -4,6 +4,7 @@ import { gameService, type Game } from '../api/game';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { CartWidget } from '../components/CartWidget';
+import { WishlistButton } from '../components/WishlistButton';
 
 export function Home() {
   const [games, setGames] = useState<Game[]>([]);
@@ -32,11 +33,11 @@ export function Home() {
   function formatPrice(price: string | number) {
     const numberPrice = Number(price);
     if (isNaN(numberPrice)) return "R$ 0,00";
-    return new Intl.NumberFormat('pt-BR', 
-      {style:
-        'currency',
+    return new Intl.NumberFormat('pt-BR',
+      {style: 
+        'currency', 
         currency: 'BRL'
-      }).format(Number(price));
+      }).format(numberPrice);
   }
 
   function handleAddToCart(game: Game) {
@@ -74,8 +75,15 @@ export function Home() {
 
             {isAuthenticated ? (
                 // Menu Logado
-                // Mensagem de boas-vindas, Biblioteca e Botão Sair
+                // Mensagem de boas-vindas, Biblioteca, Wishlist e Botão Sair
                 <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+
+                    <button 
+                      onClick={() => navigate('/wishlist')} 
+                      style={{ background: 'transparent', color: '#ff4757', border: '1px solid #555', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                        Favoritos
+                    </button>
 
                     <button 
                       onClick={() => navigate('/my-games')} 
@@ -117,8 +125,14 @@ export function Home() {
             boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            position: 'relative'
             }}>
+
+            {/* Botão da Wishlist */}
+            <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10 }}>
+                <WishlistButton gameId={Number(game.id)} />
+            </div>
 
             <div>
                 {/* Imagem do Jogo */}

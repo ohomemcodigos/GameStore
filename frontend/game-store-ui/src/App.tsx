@@ -6,7 +6,7 @@ import { CartProvider } from './context/CartContext';
 import { PrivateRoute } from './components/PrivateRoute';
 import { AdminRoute } from './components/AdminRoute';
 
-// Páginas
+// Página
 import { Login } from './pages/Login'; // de Login
 import { Home } from './pages/Home'; // da Home
 import { Register } from './pages/Register'; // de Registro
@@ -14,6 +14,7 @@ import { Checkout } from './pages/Checkout'; // de Compras
 import { MyGames } from './pages/myGames'; // da Biblioteca
 import { GameDetails } from './pages/GameDetails'; // de Detalhes do Jogo
 import { AdminDashboard } from './pages/admin/Dashboard'; // do Painel Admin
+import { Wishlist } from './pages/Wishlist'; // da Wishlist
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route element={<PrivateRoute />}>
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/my-games" element={<MyGames />} />
+              <Route path="/wishlist" element={<Wishlist />} />
             </Route>
 
             {/* --- ROTAS DE ADMIN --- */}

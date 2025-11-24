@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { gameService, type Game } from '../api/game';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { WishlistButton } from '../components/WishlistButton';
 
 export function GameDetails() {
   const { id } = useParams();
@@ -33,7 +34,11 @@ export function GameDetails() {
   }
 
   const formatPrice = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
-  const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString('pt-BR');
+  
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return 'Data desconhecida';
+    return new Date(dateStr).toLocaleDateString('pt-BR');
+  };
 
   // Função para definir a cor da classificação indicativa
   const getAgeRatingColor = (rating: string) => {
@@ -47,7 +52,8 @@ export function GameDetails() {
 
   const handleAddToCart = () => {
     if (!isAuthenticated) {
-      alert("Inicie a sessão para comprar!");
+      alert("Inicie sua sessão para comprar!");
+      navigate('/login');
       return;
     }
     if (game) {
@@ -70,8 +76,14 @@ export function GameDetails() {
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3rem' }}>
           
-          {/* --- COLUNA DA CAPA --- */}
-          <div style={{ flex: 1, minWidth: '300px', maxWidth: '400px' }}>
+          {/* Capa do Jogo */}
+          <div style={{ flex: 1, minWidth: '300px', maxWidth: '400px', position: 'relative' }}>
+            
+            {/* Botão de Favorito Flutuante */}
+            <div style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 10 }}>
+                <WishlistButton gameId={Number(game.id)} className="scale-125" />
+            </div>
+
             <img 
               src={game.coverUrl || "https://placehold.co/600x800?text=Capa"} 
               alt={game.title} 
@@ -86,7 +98,7 @@ export function GameDetails() {
             </div>
           </div>
 
-          {/* --- INFORMAÇÕES --- */}
+          {/* Informações sobre o Produto  */}
           <div style={{ flex: 1.5, minWidth: '300px' }}>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
