@@ -6,6 +6,16 @@ interface UserCreateInput {
     name: string;
     email: string;
     password: string;
+    nickname: string; 
+    avatarUrl?: string; 
+}
+
+interface UserUpdateInput {
+    name?: string;
+    email?: string;
+    password?: string;
+    nickname?: string;
+    avatarUrl?: string;
 }
 
 interface UserLoginInput {
@@ -20,18 +30,27 @@ export const UserService = {
 
     // POST: Registro
     async register(data: UserCreateInput) {
+        // Verifica E-mail
         const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
         if (existingUser) {
             throw new Error("Este email já foi cadastrado e está sendo usado."); 
+        }
+
+        // Verifica Apelidp
+        const existingNick = await prisma.user.findUnique({ where: { nickname: data.nickname } });
+        if (existingNick) {
+            throw new Error("Este apelido já está em uso. Por favor, escolha outro.");
         }
 
         const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
 
         const newUser = await prisma.user.create({
             data: {
-                ...data,
+                name: data.name,
+                email: data.email,
+                nickname: data.nickname,
                 password: hashedPassword, 
-                // role: 'USER'
+                avatarUrl: data.avatarUrl,
             },
         });
         
@@ -51,7 +70,7 @@ export const UserService = {
 
         const { password: _, ...userWithoutPassword } = user;
 
-        // Gera Token JWT incluindo a ROLE
+        // Gera Token JWT incluindo a ROLE e o ID
         const token = jwt.sign(
             { id: user.id, role: user.role }, 
             JWT_SECRET,      
@@ -73,10 +92,22 @@ export const UserService = {
     },
     
     // PUT: Update
-    async update(id: number, data: Partial<UserCreateInput>) {
+    async update(id: number, data: UserUpdateInput) {
+        // Se estiver mudando o apelido, verifica se já existe
+        if (data.nickname) {
+            const existingNick = await prisma.user.findUnique({ 
+                where: { nickname: data.nickname } 
+            });
+            // Garante que não é o próprio usuário
+            if (existingNick && existingNick.id !== id) {
+                throw new Error("Este apelido já está em uso.");
+            }
+        }
+
         if (data.password) {
             data.password = await bcrypt.hash(data.password, SALT_ROUNDS);
         }
+
         const updatedUser = await prisma.user.update({
             where: { id },
             data: data,
