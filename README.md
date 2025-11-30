@@ -75,7 +75,7 @@ Para simplificar a configuração, este projeto utiliza Docker para rodar o banc
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git)
+    git clone https://github.com/ohomemcodigos/GameStore.git
     ```
 
 2.  **Navegue até o diretório do projeto:**
@@ -144,6 +144,7 @@ model Purchase {
 ```
 # Licença
 Este projeto está sob a licença MIT.
+
 
 
 
