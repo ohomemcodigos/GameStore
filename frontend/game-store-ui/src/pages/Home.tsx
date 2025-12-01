@@ -8,6 +8,8 @@ import { WishlistButton } from "../components/WishlistButton";
 
 import logoImg from "../assets/logo.png";
 
+
+
 export function Home() {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
