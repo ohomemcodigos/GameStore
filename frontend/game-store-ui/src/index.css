@@ -18,3 +18,12 @@ body {
   margin: 0;
   font-family: "Poppins", sans-serif;
 }
+.botao:hover {
+  background-color: #b6b7e6;
+    transition: all 0.3s ease; /* Faz a animação ser suave */
+
+}
+.botao {
+
+}
+
