@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap");
+.card-game {
+  background-color: #333; /* Cor original (Tire o "red" do seu código) */
+  transition: all 0.3s ease; /* Faz a animação ser suave */
+  cursor: pointer;
+}
+.card-game:hover {
+  background-color: #444; /* Fica mais claro */
+  transform: translateY(-10px); /* Sobe um pouco */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5) !important; /* Sombra forte */
+  border: 1px solid #b6b7e6; /* Borda laranja (opcional) */
+}
+body {
+  box-sizing: border-box;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+}

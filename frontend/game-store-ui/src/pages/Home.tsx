@@ -8,8 +8,6 @@ import { WishlistButton } from "../components/WishlistButton";
 
 import logoImg from "../assets/logo.png";
 
-
-
 export function Home() {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +77,7 @@ export function Home() {
           backgroundColor: "rgba(26, 26, 26, 0.4)", // Fundo meio transparente
           backdropFilter: "blur(10px)", // Efeito de vidro borrado
           padding: "1rem 20rem", // Padding interno do menu
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.5)"
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.5)",
         }}
       >
         <img
@@ -91,6 +89,7 @@ export function Home() {
             display: "flex",
           }}
         />
+
         <div
           style={{
             display: "flex",
@@ -104,6 +103,7 @@ export function Home() {
           {isAuthenticated ? (
             // Menu Logado
             // Mensagem de boas-vindas, Biblioteca, Wishlist e Botão Sair
+
             <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
               <button
                 onClick={() => navigate("/wishlist")}
@@ -118,6 +118,22 @@ export function Home() {
               >
                 Favoritos
               </button>
+
+              {user?.role === "ADMIN" && (
+                <button
+                  onClick={() => navigate("/admin")}
+                  style={{
+                    background: "transparent",
+                    color: "#ccc", // Talvez mudar pra uma cor de destaque, tipo roxo?
+                    border: "1px solid #555",
+                    padding: "6px 12px",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Gerenciar Jogos
+                </button>
+              )}
 
               <button
                 onClick={() => navigate("/my-games")}
@@ -177,22 +193,23 @@ export function Home() {
           flexWrap: "wrap",
           gap: "1.5rem",
           justifyContent: "center",
+          marginTop: "2%",
         }}
       >
         {games.map((game) => (
           <div
             key={game.id}
+            className="card-game" // <--- AQUI ESTÁ A MÁGICA
             style={{
-              background: "#333",
               color: "white",
               padding: "1.5rem",
               borderRadius: "8px",
               width: "250px",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
               position: "relative",
+              // REMOVI: backgroundColor e boxShadow (estão no CSS agora)
             }}
           >
             {/* Botão da Wishlist */}
