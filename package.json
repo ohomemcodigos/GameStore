@@ -16,16 +16,15 @@
   "bugs": {
     "url": "https://github.com/ohomemcodigos/GameStore/issues"
   },
-"prisma": {
-  "seed": "ts-node prisma/seed.ts"
-}
-,
-  
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "homepage": "https://github.com/ohomemcodigos/GameStore#readme",
   "devDependencies": {
     "dotenv": "^17.2.3",
     "prisma": "^6.19.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0"
   }
-  
 }
-
