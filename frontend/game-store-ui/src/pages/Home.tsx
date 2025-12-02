@@ -107,8 +107,8 @@ export function Home() {
                 onClick={() => navigate("/wishlist")}
                 style={{
                   background: "transparent",
-                  color: "#ff4757",
-                  border: "1px solid #555",
+                  color: "#ffffffff",
+                  border: "0px solid #555",
                   padding: "6px 12px",
                   borderRadius: "4px",
                   cursor: "pointer",
@@ -129,8 +129,8 @@ export function Home() {
                   onClick={() => navigate("/admin")}
                   style={{
                     background: "transparent",
-                    color: "#a29bfe", // Mudei pra um roxo claro pra destacar que é especial
-                    border: "1px solid #555",
+                    color: "#ffffffff", // Mudei pra um roxo claro pra destacar que é especial
+                    border: "0px solid #555",
                     padding: "6px 12px",
                     borderRadius: "4px",
                     cursor: "pointer",
