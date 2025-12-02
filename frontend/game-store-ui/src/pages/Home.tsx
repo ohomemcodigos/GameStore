@@ -1,14 +1,12 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { gameService, type Game } from "../api/game";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { CartWidget } from "../components/CartWidget";
 import { WishlistButton } from "../components/WishlistButton";
-
+import SearchBar from '../components/barra';
 import logoImg from "../assets/logo.png";
-
-
 
 export function Home() {
   const [games, setGames] = useState<Game[]>([]);
@@ -59,12 +57,7 @@ export function Home() {
     );
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#1a1a1a",
-      }}
-    >
+    <div style={{ minHeight: "100vh", backgroundColor: "#1a1a1a" }}>
       {/* Header */}
       <div
         style={{
@@ -75,13 +68,14 @@ export function Home() {
           borderBottom: "0px solid #333",
           position: "sticky",
           top: 0,
-          zIndex: 999, // Garante que fique por cima de tudo
-          backgroundColor: "rgba(26, 26, 26, 0.4)", // Fundo meio transparente
-          backdropFilter: "blur(10px)", // Efeito de vidro borrado
-          padding: "1rem 20rem", // Padding interno do menu
+          zIndex: 999,
+          backgroundColor: "rgba(26, 26, 26, 0.4)",
+          backdropFilter: "blur(10px)",
+          padding: "1rem 4rem",
           boxShadow: "0 1px 3px rgba(0, 0, 0, 0.5)"
         }}
       >
+        {/* Logo */}
         <img
           src={logoImg}
           alt="Logo da GameStore"
@@ -91,19 +85,17 @@ export function Home() {
             display: "flex",
           }}
         />
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "20px",
-          }}
-        >
-          {/* Ícone do Carrinho ( Aparece apenas se logado) */}
+
+        {/* Search */}
+        <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+          <SearchBar />
+        </div>
+
+        {/* Right-side menu */}
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           {isAuthenticated && <CartWidget />}
 
           {isAuthenticated ? (
-            // Menu Logado
-            // Mensagem de boas-vindas, Biblioteca, Wishlist e Botão Sair
             <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
               <button
                 onClick={() => navigate("/wishlist")}
@@ -177,6 +169,7 @@ export function Home() {
           flexWrap: "wrap",
           gap: "1.5rem",
           justifyContent: "center",
+          padding: "2rem",
         }}
       >
         {games.map((game) => (
@@ -212,7 +205,7 @@ export function Home() {
               <img
                 src={game.coverUrl || "https://placehold.co/600x400?text=Game"}
                 alt={game.title}
-                onClick={() => navigate(`/game/${game.id}`)} // Navegação
+                onClick={() => navigate(`/game/${game.id}`)}
                 style={{
                   width: "100%",
                   borderRadius: "4px",
