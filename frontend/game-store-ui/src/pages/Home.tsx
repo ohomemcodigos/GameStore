@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { gameService, type Game } from "../api/game";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { CartWidget } from "../components/CartWidget";
 import { WishlistButton } from "../components/WishlistButton";
-
+import SearchBar from '../components/barra';
 import logoImg from "../assets/logo.png";
 
 export function Home() {
@@ -63,7 +63,7 @@ export function Home() {
         backgroundColor: "#1a1a1a",
       }}
     >
-      {/* --- HEADER --- */}
+      {/* Header */}
       <div
         style={{
           display: "flex",
@@ -73,13 +73,14 @@ export function Home() {
           borderBottom: "0px solid #333",
           position: "sticky",
           top: 0,
-          zIndex: 999,
-          backgroundColor: "rgba(26, 26, 26, 0.85)", // Aumentei um pouco a opacidade para ler melhor
-          backdropFilter: "blur(10px)",
-          padding: "1rem 20rem", // Ajustei o padding lateral que estava muito grande (20rem)
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.5)",
+          zIndex: 999, // Garante que fique por cima de tudo
+          backgroundColor: "rgba(26, 26, 26, 0.4)", // Fundo meio transparente
+          backdropFilter: "blur(10px)", // Efeito de vidro borrado
+          padding: "1rem 20rem", // Padding interno do menu
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.5)"
         }}
       >
+        {/* Logo */}
         <img
           src={logoImg}
           alt="Logo da GameStore"
@@ -89,7 +90,6 @@ export function Home() {
             display: "flex",
           }}
         />
-
         <div
           style={{
             display: "flex",
@@ -97,6 +97,7 @@ export function Home() {
             gap: "20px",
           }}
         >
+          {/* Ícone do Carrinho ( Aparece apenas se logado) */}
           {isAuthenticated && <CartWidget />}
 
           {isAuthenticated ? (
@@ -258,7 +259,6 @@ export function Home() {
           flexWrap: "wrap",
           gap: "1.5rem",
           justifyContent: "center",
-          marginTop: "2%",
         }}
       >
         {games.map((game) => (
@@ -294,7 +294,7 @@ export function Home() {
               <img
                 src={game.coverUrl || "https://placehold.co/600x400?text=Game"}
                 alt={game.title}
-                onClick={() => navigate(`/game/${game.id}`)} // Navegação
+                onClick={() => navigate(`/game/${game.id}`)}
                 style={{
                   width: "100%",
                   borderRadius: "4px",
