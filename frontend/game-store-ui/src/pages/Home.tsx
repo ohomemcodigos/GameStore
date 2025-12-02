@@ -63,7 +63,7 @@ export function Home() {
         backgroundColor: "#1a1a1a",
       }}
     >
-{/* --- HEADER --- */}
+      {/* --- HEADER --- */}
       <div
         style={{
           display: "flex",
@@ -101,23 +101,33 @@ export function Home() {
 
           {isAuthenticated ? (
             <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-              
               {/* 1. BOTÃO FAVORITOS (Coração) */}
+
               <button
+                className="botao"
                 onClick={() => navigate("/wishlist")}
                 style={{
                   background: "transparent",
-                  color: "#ffffffff",
                   border: "0px solid #555",
                   padding: "6px 12px",
                   borderRadius: "4px",
                   cursor: "pointer",
-                  display: "flex",         // Alinha icone e texto
-                  alignItems: "center",    // Centraliza verticalmente
-                  gap: "8px"               // Espaço entre icone e texto
+                  display: "flex", // Alinha icone e texto
+                  alignItems: "center", // Centraliza verticalmente
+                  gap: "8px", // Espaço entre icone e texto
                 }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
                 Favoritos
@@ -126,20 +136,30 @@ export function Home() {
               {/* 2. BOTÃO ADMIN (Engrenagem) */}
               {user?.role === "ADMIN" && (
                 <button
+                  className="botao"
                   onClick={() => navigate("/admin")}
                   style={{
                     background: "transparent",
-                    color: "#ffffffff", // Mudei pra um roxo claro pra destacar que é especial
                     border: "0px solid #555",
                     padding: "6px 12px",
                     borderRadius: "4px",
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
-                    gap: "8px"
+                    gap: "8px",
                   }}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <circle cx="12" cy="12" r="3"></circle>
                     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                   </svg>
@@ -149,20 +169,30 @@ export function Home() {
 
               {/* 3. BOTÃO MEUS JOGOS (Controle / Gamepad) */}
               <button
+                className="botao"
                 onClick={() => navigate("/my-games")}
                 style={{
                   background: "transparent",
-                  color: "#ccc",
                   border: "0px solid #555",
                   padding: "6px 12px",
                   borderRadius: "4px",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  gap: "8px"
+                  gap: "8px",
                 }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <line x1="6" y1="12" x2="10" y2="12"></line>
                   <line x1="8" y1="10" x2="8" y2="14"></line>
                   <line x1="15" y1="13" x2="15.01" y2="13"></line>
@@ -173,12 +203,13 @@ export function Home() {
               </button>
 
               <span
+                className="botao"
                 onClick={() => navigate("/profile")}
                 style={{
                   cursor: "pointer",
                   fontWeight: "bold",
                   textDecoration: "underline",
-                  marginLeft: "10px"
+                  marginLeft: "10px",
                 }}
               >
                 {user?.nickname || user?.name}
@@ -187,14 +218,13 @@ export function Home() {
               <button
                 onClick={signOut}
                 style={{
-                  background: "#e74c3c",
-                  color: "white",
+                  background: "#5241b2",
                   border: "none",
                   padding: "6px 12px",
                   borderRadius: "4px",
                   cursor: "pointer",
                   fontWeight: "bold",
-                  marginLeft: "10px"
+                  marginLeft: "10px",
                 }}
               >
                 Sair
@@ -202,8 +232,19 @@ export function Home() {
             </div>
           ) : (
             <button
+              className="botao"
               onClick={() => navigate("/login")}
-              style={{ padding: "8px 16px", cursor: "pointer" }}
+              style={{
+                fontSize: 15,
+                background: "transparent",
+                border: "0px solid #555",
+                padding: "6px 12px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
             >
               Inicie sua sessão
             </button>
@@ -319,7 +360,6 @@ export function Home() {
 
             {/* Botão de Carrinho */}
             <button
-            
               onClick={() => handleAddToCart(game)}
               style={{
                 marginTop: "15px",
