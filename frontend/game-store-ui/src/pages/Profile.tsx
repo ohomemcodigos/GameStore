@@ -2,6 +2,10 @@ import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { userService } from '../api/user';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, User, Lock, Camera, AlertTriangle } from 'lucide-react';
+
+// Cor definida pelo usuário
+const PRIMARY_COLOR = '#5241b2'; 
 
 export function Profile() {
   const { user } = useAuth();
@@ -46,9 +50,7 @@ export function Profile() {
     setLoading(true);
 
     try {
-      // Envia APENAS dados visuais
       await userService.updateProfile(user.id, { name, nickname, avatarUrl });
-      
       alert("Dados atualizados com sucesso!");
       window.location.reload(); 
     } catch (error) {
@@ -74,7 +76,6 @@ export function Profile() {
       return;
     }
 
-    // Confirmação extra para segurança
     if (!confirm("Tem certeza que deseja alterar seus dados de acesso?")) return;
 
     setLoading(true);
@@ -86,8 +87,6 @@ export function Profile() {
       await userService.updateProfile(user.id, payload);
       
       alert("Dados de segurança atualizados! Por favor, faça login novamente.");
-      // Aqui poderíamos deslogar o usuário por segurança
-      // authService.logout(); 
       window.location.reload();
 
     } catch (error) {
@@ -102,27 +101,63 @@ export function Profile() {
     <div style={{ padding: '2rem', minHeight: '100vh', backgroundColor: '#1a1a1a', color: 'white', display: 'flex', justifyContent: 'center' }}>
       <div style={{ maxWidth: '600px', width: '100%' }}>
         
-        {/* Cabeçalho */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2rem', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
-            <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer', fontSize: '1.2rem' }}>←</button>
-            <h1>Meu Perfil</h1>
-        </div>
+          <div style={{marginBottom:12,display: "flex", alignItems: "center", gap: "10px" }}>
+            {/* Botão de Voltar (Seta) */}
+            <button
+              onClick={() => navigate("/")}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#aaa",
+                cursor: "pointer",
+                display: "flex",
+                padding: 0,
 
+              }}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M19 12H5" />
+                <path d="M12 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            {/* Seu Título */}
+            <h2 style={{ margin: 0, color: "#fff" }}>Meu Perfil</h2>
+          </div>
         <div style={{ background: '#252525', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
             
             {/* --- ABAS DE NAVEGAÇÃO --- */}
             <div style={{ display: 'flex', borderBottom: '1px solid #444' }}>
                 <button 
                     onClick={() => setActiveTab('personal')}
-                    style={{ ...tabStyle, background: activeTab === 'personal' ? '#333' : 'transparent', color: activeTab === 'personal' ? '#4ade80' : '#ccc', borderBottom: activeTab === 'personal' ? '2px solid #4ade80' : 'none' }}
+                    style={{ 
+                        ...tabStyle, 
+                        background: activeTab === 'personal' ? '#333' : 'transparent', 
+                        color: activeTab === 'personal' ? PRIMARY_COLOR : '#ccc', 
+                        borderBottom: activeTab === 'personal' ? `2px solid ${PRIMARY_COLOR}` : 'none' 
+                    }}
                 >
-                    👤 Dados Pessoais
+                    <User size={18} /> Dados Pessoais
                 </button>
                 <button 
                     onClick={() => setActiveTab('security')}
-                    style={{ ...tabStyle, background: activeTab === 'security' ? '#333' : 'transparent', color: activeTab === 'security' ? '#ff4757' : '#ccc', borderBottom: activeTab === 'security' ? '2px solid #ff4757' : 'none' }}
+                    style={{ 
+                        ...tabStyle, 
+                        background: activeTab === 'security' ? '#333' : 'transparent', 
+                        color: activeTab === 'security' ? '#ef4444' : '#ccc', 
+                        borderBottom: activeTab === 'security' ? '2px solid #ef4444' : 'none' 
+                    }}
                 >
-                    🔒 Segurança
+                    <Lock size={18} /> Segurança
                 </button>
             </div>
 
@@ -133,13 +168,16 @@ export function Profile() {
                     <form onSubmit={handleSavePersonal}>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
                             <div style={{ 
-                                width: '100px', height: '100px', borderRadius: '50%', overflow: 'hidden', 
-                                border: '3px solid #4ade80', marginBottom: '10px', background: '#000'
+                                width: '200px', height: '200px', borderRadius: '50%', overflow: 'hidden', 
+                                border: `0px solid ${PRIMARY_COLOR}`, marginBottom: '15px', background: '#000'
                             }}>
-                                <img src={avatarUrl || "https://placehold.co/150?text=User"} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <img src={avatarUrl || "https://i.pinimg.com/736x/73/f6/84/73f6840c9d6f2abd838f034846a41911.jpg"} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             </div>
-                            <label style={{ background: '#444', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>
-                                Alterar Foto
+                            <label style={{ 
+                                background: '#444', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', 
+                                fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background 0.2s'
+                            }}>
+                                <Camera size={16} /> Alterar Foto
                                 <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
                             </label>
                         </div>
@@ -155,7 +193,7 @@ export function Profile() {
                             </div>
                         </div>
 
-                        <button type="submit" disabled={loading} style={buttonStyle}>
+                        <button type="submit" disabled={loading} style={{ ...buttonStyle, background: PRIMARY_COLOR }}>
                             {loading ? 'Salvando...' : 'Salvar Perfil'}
                         </button>
                     </form>
@@ -164,9 +202,14 @@ export function Profile() {
                 {/* === FORMULÁRIO 2: SEGURANÇA === */}
                 {activeTab === 'security' && (
                     <form onSubmit={handleSaveSecurity}>
-                        <p style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '1.5rem', padding: '10px', background: 'rgba(255,0,0,0.1)', borderRadius: '4px' }}>
-                            ⚠️ Cuidado ao alterar estes dados. Você precisará usar o novo email/senha no próximo login.
-                        </p>
+                        <div style={{ 
+                            fontSize: '0.9rem', color: '#ffcccb', marginBottom: '1.5rem', padding: '12px', 
+                            background: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.2)',
+                            display: 'flex', alignItems: 'start', gap: '10px'
+                        }}>
+                            <AlertTriangle size={20} style={{ flexShrink: 0 }} />
+                            <span>Cuidado ao alterar estes dados. Você precisará usar o novo email/senha no próximo login.</span>
+                        </div>
 
                         <div style={{ display: 'grid', gap: '1rem' }}>
                             <div>
@@ -174,7 +217,7 @@ export function Profile() {
                                 <input required type="email" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
                             </div>
 
-                            <hr style={{ borderColor: '#444', margin: '1rem 0', width: '100%' }} />
+                            <hr style={{ borderColor: '#444', margin: '1rem 0', width: '100%', opacity: 0.5 }} />
 
                             <div>
                                 <label style={labelStyle}>Nova Senha</label>
@@ -186,7 +229,7 @@ export function Profile() {
                             </div>
                         </div>
 
-                        <button type="submit" disabled={loading} style={{ ...buttonStyle, background: '#e74c3c' }}>
+                        <button type="submit" disabled={loading} style={{ ...buttonStyle, background: '#ef4444' }}>
                             {loading ? 'Salvando...' : 'Atualizar Segurança'}
                         </button>
                     </form>
@@ -210,11 +253,12 @@ const labelStyle = {
 };
 
 const tabStyle = {
-    flex: 1, padding: '15px', cursor: 'pointer', border: 'none', fontSize: '1rem', fontWeight: 'bold', transition: 'all 0.2s'
+    flex: 1, padding: '15px', cursor: 'pointer', border: 'none', fontSize: '1rem', 
+    fontWeight: 'bold', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
 };
 
 const buttonStyle = {
     marginTop: '2rem', width: '100%', padding: '12px', 
-    background: '#4ade80', color: 'white', border: 'none', 
+    color: 'white', border: 'none', 
     borderRadius: '4px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer'
 };
