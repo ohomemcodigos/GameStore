@@ -3,10 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { gameService, type Game } from "../api/game";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+
+
+// Componentes
 import { CartWidget } from "../components/CartWidget";
 import { WishlistButton } from "../components/WishlistButton";
-import SearchBar from '../components/barra';
+import { HeaderSearch } from "../components/HeaderSearch"; // <--- Importado
+import { FeaturedCarousel } from "../components/FeaturedCarousel"; // <--- Importado
+
+// Assets
 import logoImg from "../assets/logo.png";
+import logoAltImg from "../assets/logo-alt.png";
 
 export function Home() {
   const [games, setGames] = useState<Game[]>([]);
@@ -20,6 +27,8 @@ export function Home() {
     loadGames();
   }, []);
 
+
+  
   async function loadGames() {
     try {
       const data = await gameService.getAll();
@@ -73,14 +82,14 @@ export function Home() {
           borderBottom: "0px solid #333",
           position: "sticky",
           top: 0,
-          zIndex: 999, // Garante que fique por cima de tudo
-          backgroundColor: "rgba(26, 26, 26, 0.4)", // Fundo meio transparente
-          backdropFilter: "blur(10px)", // Efeito de vidro borrado
-          padding: "1rem 20rem", // Padding interno do menu
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.5)"
+          zIndex: 999,
+          backgroundColor: "rgba(26, 26, 26, 0.85)", // Opacidade ajustada
+          backdropFilter: "blur(10px)",
+          padding: "1rem 20rem", // Padding ajustado
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.5)",
         }}
       >
-        {/* Logo */}
+        {/* 1. Logo (Esquerda) */}
         <img
           src={logoImg}
           alt="Logo da GameStore"
@@ -90,6 +99,11 @@ export function Home() {
             display: "flex",
           }}
         />
+
+
+        <HeaderSearch games={games} />
+
+        {/* 3. Botões e Carrinho (Direita) */}
         <div
           style={{
             display: "flex",
@@ -97,13 +111,12 @@ export function Home() {
             gap: "20px",
           }}
         >
-          {/* Ícone do Carrinho ( Aparece apenas se logado) */}
+          {/* Ícone do Carrinho */}
           {isAuthenticated && <CartWidget />}
 
           {isAuthenticated ? (
             <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-              {/* 1. BOTÃO FAVORITOS (Coração) */}
-
+              {/* Botão Favoritos */}
               <button
                 className="botao"
                 onClick={() => navigate("/wishlist")}
@@ -113,9 +126,9 @@ export function Home() {
                   padding: "6px 12px",
                   borderRadius: "4px",
                   cursor: "pointer",
-                  display: "flex", // Alinha icone e texto
-                  alignItems: "center", // Centraliza verticalmente
-                  gap: "8px", // Espaço entre icone e texto
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
                 }}
               >
                 <svg
@@ -134,7 +147,7 @@ export function Home() {
                 Favoritos
               </button>
 
-              {/* 2. BOTÃO ADMIN (Engrenagem) */}
+              {/* Botão Admin */}
               {user?.role === "ADMIN" && (
                 <button
                   className="botao"
@@ -168,7 +181,7 @@ export function Home() {
                 </button>
               )}
 
-              {/* 3. BOTÃO MEUS JOGOS (Controle / Gamepad) */}
+              {/* Botão Biblioteca */}
               <button
                 className="botao"
                 onClick={() => navigate("/my-games")}
@@ -203,32 +216,44 @@ export function Home() {
                 Biblioteca
               </button>
 
-              <span
-                className="botao"
-                onClick={() => navigate("/profile")}
-                style={{
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                  textDecoration: "underline",
-                  marginLeft: "10px",
-                }}
-              >
-                {user?.nickname || user?.name}
-              </span>
-
               <button
                 onClick={signOut}
+                title="Sair da conta"
                 style={{
-                  background: "#5241b2",
+                  background: "transparent",
                   border: "none",
-                  padding: "6px 12px",
-                  borderRadius: "4px",
                   cursor: "pointer",
-                  fontWeight: "bold",
-                  marginLeft: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "8px",
+                  borderRadius: "50%",
+                  color: "#e74c3c", // Cor vermelha suave para sair
+                  transition: "background 0.2s",
                 }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor =
+                    "rgba(231, 76, 60, 0.1)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "transparent")
+                }
               >
-                Sair
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
               </button>
             </div>
           ) : (
@@ -252,6 +277,10 @@ export function Home() {
           )}
         </div>
       </div>
+
+      {/* --- CARROSSEL DE DESTAQUES (NOVO) --- */}
+      <FeaturedCarousel games={games} />
+
       {/* Grid de Jogos */}
       <div
         style={{
@@ -259,12 +288,13 @@ export function Home() {
           flexWrap: "wrap",
           gap: "1.5rem",
           justifyContent: "center",
+          padding: "2rem",
         }}
       >
         {games.map((game) => (
           <div
             key={game.id}
-            className="card-game" // <--- AQUI ESTÁ A MÁGICA
+            className="card-game"
             style={{
               color: "white",
               padding: "1.5rem",
@@ -274,7 +304,6 @@ export function Home() {
               flexDirection: "column",
               justifyContent: "space-between",
               position: "relative",
-              // REMOVI: backgroundColor e boxShadow (estão no CSS agora)
             }}
           >
             {/* Botão da Wishlist */}

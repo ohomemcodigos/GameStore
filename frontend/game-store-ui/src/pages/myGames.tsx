@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { orderService, type Order } from "../api/order";
+import { ArrowLeft } from "lucide-react";
 
 export function MyGames() {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,19 +40,39 @@ export function MyGames() {
         color: "white",
       }}
     >
-      
       <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-        <h1
-          style={{
-            display: "flex",
-            borderBottom: "1px solid #333",
-            paddingBottom: "1rem",
-          }}
-        >
-          Minha Biblioteca 🎮
-        </h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Botão de Voltar (Seta) */}
+          <button
+            onClick={() => navigate("/")}
+            className="botao"
+            style={{
+              background: "none",
+              border: "none",
 
+              cursor: "pointer",
+              display: "flex",
+              padding: 0,
+            }}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5" />
+              <path d="M12 19l-7-7 7-7" />
+            </svg>
+          </button>
 
+          {/* Seu Título */}
+          <h2 style={{ margin: 0, color: "#fff" }}>Minha Biblioteca</h2>
+        </div>
 
         {orders.length === 0 ? (
           <p style={{ color: "#aaa", marginTop: "2rem" }}>
