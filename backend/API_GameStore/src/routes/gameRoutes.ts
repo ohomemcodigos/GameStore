@@ -1,26 +1,33 @@
 import { Router } from 'express';
-import { gameController } from '../controllers/gameController'; // <--- Importação atualizada
-import { authMiddleware } from '../middlewares/authMiddleware'; // <--- Proteção de Login
-import { adminMiddleware } from '../middlewares/adminMiddleware'; // <--- Proteção de Admin
+import { gameController } from '../controllers/gameController';
+import { authMiddleware } from '../middlewares/authMiddleware';
+import { adminMiddleware } from '../middlewares/adminMiddleware';
 
 const router = Router();
 
 /**
  * @swagger
  * tags:
- *   name: Games
- *   description: API para gerenciamento de jogos
+ *   - name: Games
+ *     description: Gerenciamento do catálogo de jogos
  */
 
 /**
  * @swagger
  * /api/games:
  *   get:
- *     summary: Retorna a lista de todos os jogos
- *     tags: [Games]
+ *     summary: Lista todos os jogos
+ *     tags:
+ *       - Games
  *     responses:
  *       200:
- *         description: Lista de jogos retornada com sucesso
+ *         description: Lista retornada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Game'
  */
 router.get('/', gameController.getAllGames);
 
@@ -28,31 +35,34 @@ router.get('/', gameController.getAllGames);
  * @swagger
  * /api/games/{id}:
  *   get:
- *     summary: Retorna um jogo específico pelo seu ID
- *     tags: [Games]
+ *     summary: Busca um jogo pelo ID
+ *     tags:
+ *       - Games
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
- *         description: O ID do jogo
  *     responses:
  *       200:
- *         description: Jogo encontrado com sucesso
+ *         description: Detalhes do jogo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Game'
  *       404:
  *         description: Jogo não encontrado
  */
 router.get('/:id', gameController.getGamesById);
 
-
-
 /**
  * @swagger
  * /api/games:
  *   post:
- *     summary: Cria um novo jogo (Requer Admin)
- *     tags: [Games]
+ *     summary: Cria um novo jogo (ADMIN)
+ *     tags:
+ *       - Games
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -60,16 +70,12 @@ router.get('/:id', gameController.getGamesById);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Game'
+ *             $ref: '#/components/schemas/GameInput'
  *     responses:
  *       201:
  *         description: Jogo criado com sucesso
- *       401:
- *         description: Não autorizado
  *       403:
- *         description: Acesso proibido
- *       500:
- *         description: Erro ao criar o jogo
+ *         description: Acesso negado (apenas Admin)
  */
 router.post('/', authMiddleware, adminMiddleware, gameController.create);
 
@@ -77,30 +83,26 @@ router.post('/', authMiddleware, adminMiddleware, gameController.create);
  * @swagger
  * /api/games/{id}:
  *   put:
- *     summary: Atualiza um jogo existente pelo ID (Requer Admin)
- *     tags: [Games]
+ *     summary: Atualiza um jogo (ADMIN)
+ *     tags:
+ *       - Games
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
- *         schema:
- *         type: integer
  *         required: true
- *         description: O ID do jogo
+ *         schema:
+ *           type: integer
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Game'
+ *             $ref: '#/components/schemas/GameInput'
  *     responses:
  *       200:
- *         description: Jogo atualizado com sucesso
- *       401:
- *         description: Não autorizado
- *       403:
- *         description: Acesso proibido
+ *         description: Jogo atualizado
  *       404:
  *         description: Jogo não encontrado
  */
@@ -110,26 +112,20 @@ router.put('/:id', authMiddleware, adminMiddleware, gameController.update);
  * @swagger
  * /api/games/{id}:
  *   delete:
- *     summary: Deleta um jogo pelo ID (Requer Admin)
- *     tags: [Games]
+ *     summary: Remove um jogo (ADMIN)
+ *     tags:
+ *       - Games
  *     security:
- *      - bearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
- *         description: O ID do jogo
  *     responses:
  *       204:
- *         description: Jogo deletado com sucesso
- *       401:
- *         description: Não autorizado
- *       403:
- *         description: Acesso proibido
- *       404:
- *         description: Jogo não encontrado
+ *         description: Jogo removido
  */
 router.delete('/:id', authMiddleware, adminMiddleware, gameController.delete);
 
