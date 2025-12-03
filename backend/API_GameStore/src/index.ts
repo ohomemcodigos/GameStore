@@ -51,6 +51,8 @@ app.use((req, res) => {
 
 // Inicia o servidor
 app.listen(port, () => {
-  console.log(`Servidor ligou! Servidor rodando em ${baseUrl}`);
-  console.log(`Verifique a Documentação via Swagger por aqui: ${baseUrl}/api-docs/`)
+  const baseUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${port}`;
+
+  console.log(`Servidor ligou! Ele está rodando em ${baseUrl}`);
+  console.log(`Verifique a Documentação via Swagger por aqui: ${baseUrl}/api-docs/`);
 });
