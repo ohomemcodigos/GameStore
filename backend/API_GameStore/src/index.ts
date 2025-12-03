@@ -39,6 +39,6 @@ app.use('/api/wishlist', wishlistRoutes);
 
 // Inicia o servidor
 app.listen(port, () => {
-  console.log(`Servidor ligou! Ele está rodando em http://localhost:${port}`);
-  console.log(`Verifique a Documentação via Swagger por aqui: http://localhost:${port}/api-docs/`)
+  console.log(`Servidor ligou! Servidor rodando em ${baseUrl}`);
+  console.log(`Verifique a Documentação via Swagger por aqui: ${baseUrl}/api-docs/`)
 });
