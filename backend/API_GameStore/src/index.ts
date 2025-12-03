@@ -51,6 +51,6 @@ app.use((req, res) => {
 
 // Inicia o servidor
 app.listen(port, () => {
-  console.log(`✅ Servidor ligou! Rodando em http://localhost:${port}`);
-  console.log(`📚 Documentação Swagger: http://localhost:${port}/api-docs/`)
+  console.log(`Servidor ligou! Servidor rodando em ${baseUrl}`);
+  console.log(`Verifique a Documentação via Swagger por aqui: ${baseUrl}/api-docs/`)
 });
