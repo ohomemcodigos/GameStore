@@ -18,6 +18,10 @@ import { Wishlist } from './pages/Wishlist'; // da Wishlist
 import { Profile } from './pages/Profile'; // do Perfil do Usuário
 import barra from './components/barra';
 
+
+
+
+
 function App() {
   return (
     <AuthProvider>

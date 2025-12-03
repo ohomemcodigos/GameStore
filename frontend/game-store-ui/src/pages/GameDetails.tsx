@@ -5,7 +5,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { WishlistButton } from "../components/WishlistButton";
 import { GameCarousel } from "../components/GameCarousel"; // <--- Mantém o import
-
+import ReviewSection from '../components/reviewsection';
 export function GameDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -127,8 +127,9 @@ export function GameDetails() {
               <p><strong style={{ color: "#aaa" }}>Publicadora:</strong> {game.publisher?.join(", ") || "N/A"}</p>
               <p><strong style={{ color: "#aaa" }}>Lançamento:</strong> {game.releaseDate ? formatDate(game.releaseDate) : "N/A"}</p>
             </div>
+            <ReviewSection gameId={Number(game.id)} /> 
           </div>
-
+ 
           {/* --- COLUNA DIREITA: DETALHES, COMPRA E CARROSSEL --- */}
           <div style={{ flex: 1.5, minWidth: "300px" }}>
             
