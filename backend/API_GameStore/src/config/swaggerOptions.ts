@@ -1,35 +1,123 @@
-export const swaggerOptions = {
-  swaggerDefinition: {
+import { Options } from 'swagger-jsdoc';
+
+export const swaggerOptions: Options = {
+  definition: {
     openapi: '3.0.0',
     info: {
-      title: 'API de Loja de Jogos',
+      title: 'Game Store API',
       version: '1.0.0',
-      description: 'Documentação da API para a loja de jogos online, feita com Express.js e Prisma.',
+      description: 'API de loja de jogos digitais',
     },
-    servers: [
-      {
-        url: 'http://localhost:3000', // A URL base da API
-      },
-    ],
-    // Criando os 'components' para definir schemas reutilizáveis
+
     components: {
-        schemas: {
-            Game: {
-                type: 'object',
-                required: ['title', 'genre', 'price'],
-                properties: {
-                    id: { type: 'integer', description: 'O ID auto-gerado do jogo' },
-                    title: { type: 'string', description: 'O título do jogo' },
-                    description: { type: 'string', description: 'Uma breve descrição do jogo' },
-                    genre: { type: 'string', description: 'O gênero do jogo' },
-                    price: { type: 'number', format: 'float', description: 'O preço do jogo' },
-                    createdAt: { type: 'string', format: 'date-time', description: 'Data de criação' },
-                    updatedAt: { type: 'string', format: 'date-time', description: 'Última atualização' },
-                }
-            }
-        }
-    }
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+
+      schemas: {
+        // =====================
+        // GAME (resposta)
+        // =====================
+        Game: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            title: { type: 'string' },
+            slug: { type: 'string' },
+            description: { type: 'string', nullable: true },
+            genre: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            ageRating: { type: 'string', example: 'L' },
+            platforms: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            developer: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            publisher: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            releaseDate: {
+              type: 'string',
+              format: 'date-time',
+            },
+            price: { type: 'number', format: 'float' },
+            discountPrice: {
+              type: 'number',
+              format: 'float',
+              nullable: true,
+            },
+            coverUrl: { type: 'string', nullable: true },
+            isFeatured: { type: 'boolean' },
+            systemRequirements: {
+              type: 'object',
+              nullable: true,
+            },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+
+        // =====================
+        // GAME INPUT (POST / PUT)
+        // =====================
+        GameInput: {
+          type: 'object',
+          required: [
+            'title',
+            'slug',
+            'genre',
+            'developer',
+            'publisher',
+            'releaseDate',
+            'price',
+          ],
+          properties: {
+            title: { type: 'string' },
+            slug: { type: 'string' },
+            description: { type: 'string' },
+            genre: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            ageRating: { type: 'string', example: 'L' },
+            platforms: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            developer: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            publisher: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            releaseDate: {
+              type: 'string',
+              format: 'date-time',
+            },
+            price: { type: 'number', format: 'float' },
+            discountPrice: { type: 'number', format: 'float' },
+            coverUrl: { type: 'string' },
+            isFeatured: { type: 'boolean' },
+            systemRequirements: { type: 'object' },
+          },
+        },
+      },
+    },
+
+    security: [{ bearerAuth: [] }],
   },
-  // O caminho para os arquivos que contêm os comentários de documentação da API
-  apis: ['./src/routes/*.ts'], 
+
+  apis: ['src/routes/*.ts'], // ⚠️ CONFERE ESSE PATH
 };
