@@ -1,0 +1,36 @@
+{
+  "name": "gamestore",
+  "version": "1.0.0",
+  "description": "> Uma API RESTful robusta para gerenciar uma plataforma de venda de jogos online, desenvolvida com Node.js, Express, TypeScript e Prisma.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ohomemcodigos/GameStore.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ohomemcodigos/GameStore/issues"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "homepage": "https://github.com/ohomemcodigos/GameStore#readme",
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.6",
+    "dotenv": "^17.2.3",
+    "prisma": "^6.19.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "bcrypt": "^6.0.0",
+    "express": "^5.2.1"
+  }
+}

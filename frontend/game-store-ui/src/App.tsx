@@ -16,6 +16,11 @@ import { GameDetails } from './pages/GameDetails'; // de Detalhes do Jogo
 import { AdminDashboard } from './pages/admin/Dashboard'; // do Painel Admin
 import { Wishlist } from './pages/Wishlist'; // da Wishlist
 import { Profile } from './pages/Profile'; // do Perfil do Usuário
+import barra from './components/barra';
+
+
+
+
 
 function App() {
   return (

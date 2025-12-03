@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 interface WishlistButtonProps {
   gameId: number;
-  className?: string; // Para poder estilizar de fora se precisar
+  className?: string;
 }
 
 export function WishlistButton({ gameId, className }: WishlistButtonProps) {
@@ -14,7 +14,6 @@ export function WishlistButton({ gameId, className }: WishlistButtonProps) {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  // Verifica status ao carregar o botão
   useEffect(() => {
     if (isAuthenticated) {
       wishlistService.checkStatus(gameId).then(status => setIsWishlisted(status));
@@ -22,7 +21,7 @@ export function WishlistButton({ gameId, className }: WishlistButtonProps) {
   }, [gameId, isAuthenticated]);
 
   async function handleToggle(e: MouseEvent) {
-    e.stopPropagation(); // Evita clicar no card do jogo sem querer
+    e.stopPropagation();
     e.preventDefault();
 
     if (!isAuthenticated) {
@@ -31,11 +30,18 @@ export function WishlistButton({ gameId, className }: WishlistButtonProps) {
       return;
     }
 
+
+    const previousState = isWishlisted;
+    setIsWishlisted(!previousState); 
     setLoading(true);
+
     try {
       const result = await wishlistService.toggle(gameId);
+  
       setIsWishlisted(result.action === 'added');
     } catch (error) {
+
+      setIsWishlisted(previousState);
       console.error(error);
     } finally {
       setLoading(false);
@@ -48,22 +54,40 @@ export function WishlistButton({ gameId, className }: WishlistButtonProps) {
       disabled={loading}
       className={className}
       style={{
-        background: 'rgba(0,0,0,0.6)',
+        background: 'rgba(0,0,0,0.6)', 
         border: 'none',
         borderRadius: '50%',
-        width: '35px',
-        height: '35px',
+        width: '40px',
+        height: '40px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         cursor: 'pointer',
         transition: 'transform 0.2s',
-        fontSize: '1.2rem',
-        color: isWishlisted ? '#ff4757' : 'white' // Vermelho se curtido, Branco se não
       }}
-      title={isWishlisted ? "Remover da Lista de Desejos" : "Adicionar à Lista de Desejos"}
+      title={isWishlisted ? "Remover" : "Adicionar"}
     >
-      {isWishlisted ? '❤️' : '🤍'} 
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="24" 
+        height="24" 
+        viewBox="0 0 24 24" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+        
+        stroke={isWishlisted ? "#5241b2" : "white"} 
+        
+        fill={isWishlisted ? "#5241b2" : "none"}
+
+        style={{
+          transition: "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)", 
+          
+          transform: isWishlisted ? "scale(1.2)" : "scale(1)" 
+        }}
+      >
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
     </button>
   );
 }
