@@ -334,7 +334,11 @@ async function main() {
   
   for (const game of gamesList) {
     await prisma.game.upsert({
-      where: { title: game.title }, // Usa o título como chave única para não duplicar
+<<<<<<< HEAD
+      where: { title: game.title },
+      update: {}, // <--- MUDANÇA AQUI: Mantém os dados atuais se o jogo já existir
+=======
+      where: { title: game.title }, // Usa o título como chave única
       update: {
         // Se o jogo já existe, atualizamos os dados para garantir que está tudo novo
         coverUrl: game.coverUrl,
@@ -346,6 +350,7 @@ async function main() {
         ageRating: game.ageRating,
         platforms: game.platforms,
       },
+>>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
       create: {
         title: game.title,
         slug: game.slug,
@@ -355,8 +360,13 @@ async function main() {
         platforms: game.platforms,
         developer: game.developer,
         publisher: game.publisher,
+<<<<<<< HEAD
+        releaseDate: new Date(game.releaseDate),
+        price: new Decimal(game.price),
+=======
         releaseDate: new Date(game.releaseDate), // Converte string para Date
         price: new Decimal(game.price),          // Converte number para Decimal
+>>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
         discountPrice: game.discountPrice ? new Decimal(game.discountPrice) : null,
         coverUrl: game.coverUrl,
         isFeatured: game.isFeatured,
@@ -375,4 +385,4 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
-  });
+  }); 
