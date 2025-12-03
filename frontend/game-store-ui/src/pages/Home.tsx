@@ -4,16 +4,17 @@ import { gameService, type Game } from "../api/game";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 
-
 // Componentes
 import { CartWidget } from "../components/CartWidget";
 import { WishlistButton } from "../components/WishlistButton";
 import { HeaderSearch } from "../components/HeaderSearch"; // <--- Importado
 import { FeaturedCarousel } from "../components/FeaturedCarousel"; // <--- Importado
+import { Heart, Settings, Gamepad2, LogOut, LogIn, User } from "lucide-react";
 
 // Assets
 import logoImg from "../assets/logo.png";
 import logoAltImg from "../assets/logo-alt.png";
+import defaultAvatar from "../assets/icon.png";
 
 export function Home() {
   const [games, setGames] = useState<Game[]>([]);
@@ -27,8 +28,6 @@ export function Home() {
     loadGames();
   }, []);
 
-
-  
   async function loadGames() {
     try {
       const data = await gameService.getAll();
@@ -83,35 +82,24 @@ export function Home() {
           position: "sticky",
           top: 0,
           zIndex: 999,
-          backgroundColor: "rgba(26, 26, 26, 0.85)", // Opacidade ajustada
+          backgroundColor: "rgba(26, 26, 26, 0.75)",
           backdropFilter: "blur(10px)",
-          padding: "1rem 20rem", // Padding ajustado
+          padding: "1rem 20rem",
           boxShadow: "0 1px 3px rgba(0, 0, 0, 0.5)",
         }}
       >
-        {/* 1. Logo (Esquerda) */}
+        {/* 1. Logo */}
         <img
           src={logoImg}
           alt="Logo da GameStore"
-          style={{
-            width: "150px",
-            height: "auto",
-            display: "flex",
-          }}
+          style={{ width: "150px", height: "auto", display: "flex" }}
         />
 
-
+        {/* 2. Barra de Pesquisa */}
         <HeaderSearch games={games} />
 
-        {/* 3. Botões e Carrinho (Direita) */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "20px",
-          }}
-        >
-          {/* Ícone do Carrinho */}
+        {/* 3. Área do Usuário */}
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
           {isAuthenticated && <CartWidget />}
 
           {isAuthenticated ? (
@@ -122,7 +110,7 @@ export function Home() {
                 onClick={() => navigate("/wishlist")}
                 style={{
                   background: "transparent",
-                  border: "0px solid #555",
+                  border: "none",
                   padding: "6px 12px",
                   borderRadius: "4px",
                   cursor: "pointer",
@@ -131,19 +119,7 @@ export function Home() {
                   gap: "8px",
                 }}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
+                <Heart size={18} />
                 Favoritos
               </button>
 
@@ -154,7 +130,7 @@ export function Home() {
                   onClick={() => navigate("/admin")}
                   style={{
                     background: "transparent",
-                    border: "0px solid #555",
+                    border: "none",
                     padding: "6px 12px",
                     borderRadius: "4px",
                     cursor: "pointer",
@@ -163,20 +139,7 @@ export function Home() {
                     gap: "8px",
                   }}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                  </svg>
+                  <Settings size={18} />
                   Gerenciar
                 </button>
               )}
@@ -187,7 +150,7 @@ export function Home() {
                 onClick={() => navigate("/my-games")}
                 style={{
                   background: "transparent",
-                  border: "0px solid #555",
+                  border: "none",
                   padding: "6px 12px",
                   borderRadius: "4px",
                   cursor: "pointer",
@@ -196,26 +159,48 @@ export function Home() {
                   gap: "8px",
                 }}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="6" y1="12" x2="10" y2="12"></line>
-                  <line x1="8" y1="10" x2="8" y2="14"></line>
-                  <line x1="15" y1="13" x2="15.01" y2="13"></line>
-                  <line x1="18" y1="11" x2="18.01" y2="11"></line>
-                  <rect x="2" y="6" width="20" height="12" rx="2"></rect>
-                </svg>
+                <Gamepad2 size={18} />
                 Biblioteca
               </button>
 
+              {/* --- PERFIL DO USUÁRIO --- */}
+              <div
+                onClick={() => navigate("/profile")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  marginLeft: "10px",
+                  paddingLeft: "15px",
+                  borderLeft: "1px solid #444",
+                  cursor: "pointer",
+                }}
+              >
+                {/* Avatar: Imagem Real ou Fallback */}
+                <img
+                  src={user?.avatarUrl || defaultAvatar}
+                  alt="Avatar"
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "50%", // Deixa redondo
+                    objectFit: "cover", // Garante que a imagem não fique esticada/amassada
+                    border: "0px solid #5241b2", // Uma borda roxa fina para combinar
+                  }}
+                />
+
+                <span
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: "0.9rem",
+                    color: "#fff",
+                  }}
+                >
+                  {user?.nickname || user?.name}
+                </span>
+              </div>
+
+              {/* Botão Sair */}
               <button
                 onClick={signOut}
                 title="Sair da conta"
@@ -228,7 +213,7 @@ export function Home() {
                   justifyContent: "center",
                   padding: "8px",
                   borderRadius: "50%",
-                  color: "#e74c3c", // Cor vermelha suave para sair
+                  color: "#e74c3c", // Vermelho
                   transition: "background 0.2s",
                 }}
                 onMouseEnter={(e) =>
@@ -239,21 +224,7 @@ export function Home() {
                   (e.currentTarget.style.backgroundColor = "transparent")
                 }
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <polyline points="16 17 21 12 16 7"></polyline>
-                  <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
+                <LogOut size={20} />
               </button>
             </div>
           ) : (
@@ -263,15 +234,17 @@ export function Home() {
               style={{
                 fontSize: 15,
                 background: "transparent",
-                border: "0px solid #555",
+                border: "none",
                 padding: "6px 12px",
                 borderRadius: "4px",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 gap: "8px",
+                color: "white",
               }}
             >
+              <LogIn size={18} />
               Inicie sua sessão
             </button>
           )}

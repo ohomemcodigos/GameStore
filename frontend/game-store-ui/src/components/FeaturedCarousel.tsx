@@ -41,13 +41,13 @@ export function FeaturedCarousel({ games }: { games: Game[] }) {
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(val);
 
   return (
-    <div style={{ width: "100%", maxWidth: "1200px", margin: "2rem auto", position: "relative" }}>
+    <div style={{ width: "100%", maxWidth: "1550px", margin: "2rem auto", position: "relative" }}>
       
       {/* Container Principal (Card Estilo Steam) */}
       <div
         style={{
           display: "flex",
-          height: "400px", // Altura do carrossel
+          height: "500px", // Altura do carrossel
           backgroundColor: "#333333", // Fundo bem escuro
           overflow: "hidden",
           position: "relative",
