@@ -4,7 +4,7 @@ import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
-import { swaggerOptions } from '../config/swaggerOptions'; //Configuração do Swagger
+import { swaggerOptions } from './config/swaggerOptions'; //Configuração do Swagger
 
 // Importação das Rotas
 import gameRoutes from './routes/gameRoutes';
