@@ -27,14 +27,15 @@ export interface Game {
 export type CreateGameDTO = Omit<Game, 'id' | 'gallery'>;
 
 export const gameService = {
-  // Busca a lista completa de jogos
+ // Busca a lista completa de jogos
   async getAll(): Promise<Game[]> {
     const response = await api.get<Game[]>('/api/games');
     return response.data;
   },
 
-  // Busca jogo por ID
+  // Busca jogo por ID/SLUG (Aqui está o foco da correção)
   async getById(id: string | number): Promise<Game> {
+    // Garante que a requisição bate em /api/games/slug-name
     const response = await api.get<Game>(`/api/games/${id}`);
     return response.data;
   },
