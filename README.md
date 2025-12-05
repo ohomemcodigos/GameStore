@@ -42,7 +42,7 @@
 
 Acesse o projeto rodando em produção:
 
-* **Frontend (Site):** 🔗 [bizarre-games-store.com](https://bizarre-game-store.vercel.app/)
+* **Frontend (Site):** 🔗 [bizarre-games-store.com](https://bizarre-games.vercel.app/)
 * **API (Swagger Docs):** 🔗 [game-store-api/api-docs/](https://game-store-api-ykwm.onrender.com/api-docs/)
 
 ---
@@ -259,4 +259,5 @@ Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 [⬆ Voltar ao topo](#-bizarre-store)
 
 </div>
+
 
