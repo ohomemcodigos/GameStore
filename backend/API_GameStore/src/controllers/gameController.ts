@@ -22,15 +22,19 @@ export const gameController = {
     // GET - Buscar jogo por ID ou SLUG
     async getGamesById(req: Request, res: Response) {
         try {
-            const param = req.params.id; // O Express chama de 'id', mas pode ser 'god-of-war'
+            const param = req.params.id;
+            const idAsNumber = Number(param); // Tenta converter
 
             let game;
 
-            // Verifica se é puramente numérico (ID)
-            if (!isNaN(Number(param))) {
-                game = await GameService.findById(Number(param)); 
+            // Prioriza a busca por ID SOMENTE se for um número inteiro e positivo
+            if (!isNaN(idAsNumber) && idAsNumber > 0 && idAsNumber === Math.floor(idAsNumber)) {
+                game = await GameService.findById(idAsNumber);
             } else {
-                // Se não for número, assume que é Slug
+                // Se não for um ID válido, assume que o parâmetro é o SLUG
+                if (!param || param.trim() === '') {
+                   return res.status(400).json({ error: "O parâmetro de busca não pode ser vazio." });
+                }
                 game = await GameService.findBySlug(param);
             }
 
@@ -40,6 +44,7 @@ export const gameController = {
             res.status(200).json(game); 
         } catch (error) {
             console.error(error);
+            // Manter como 500 para erros internos (Service/DB)
             res.status(500).json( {error: "Erro ao buscar jogo." } ); 
         }
     },
