@@ -18,9 +18,10 @@ export interface Game {
   price:       string | number;
   discountPrice?: string | number;
   coverUrl?:   string;
+
   gallery?: { id: number; type: string; url: string }[];
 
-  isFeatured:  boolean;
+  isFeatured:  boolean; 
 }
 
 export type CreateGameDTO = Omit<Game, 'id' | 'gallery'>;

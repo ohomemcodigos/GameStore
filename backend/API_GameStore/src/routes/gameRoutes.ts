@@ -17,8 +17,7 @@ const router = Router();
  * /api/games:
  *   get:
  *     summary: Lista todos os jogos
- *     tags:
- *       - Games
+ *     tags: [Games]
  *     responses:
  *       200:
  *         description: Lista retornada com sucesso
@@ -36,8 +35,7 @@ router.get('/', gameController.getAllGames);
  * /api/games/{id}:
  *   get:
  *     summary: Busca um jogo pelo ID
- *     tags:
- *       - Games
+ *     tags: [Games]
  *     parameters:
  *       - in: path
  *         name: id
@@ -61,8 +59,7 @@ router.get('/:id', gameController.getGamesById);
  * /api/games:
  *   post:
  *     summary: Cria um novo jogo (ADMIN)
- *     tags:
- *       - Games
+ *     tags: [Games]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -84,8 +81,7 @@ router.post('/', authMiddleware, adminMiddleware, gameController.create);
  * /api/games/{id}:
  *   put:
  *     summary: Atualiza um jogo (ADMIN)
- *     tags:
- *       - Games
+ *     tags: [Games]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -113,8 +109,7 @@ router.put('/:id', authMiddleware, adminMiddleware, gameController.update);
  * /api/games/{id}:
  *   delete:
  *     summary: Remove um jogo (ADMIN)
- *     tags:
- *       - Games
+ *     tags: [Games]
  *     security:
  *       - bearerAuth: []
  *     parameters:

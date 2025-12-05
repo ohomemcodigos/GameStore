@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 export function CartWidget() {
   const { cart, removeFromCart, total } = useCart();
   const [isOpen, setIsOpen] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessing] = useState(false);
   const navigate = useNavigate();
 
   const cartRef = useRef<HTMLDivElement>(null);

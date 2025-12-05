@@ -5,11 +5,7 @@ import { Decimal } from '@prisma/client/runtime/library';
 const prisma = new PrismaClient();
 const SALT_ROUNDS = 10;
 
-<<<<<<< HEAD
-// Lista de jogos baseada no JSON fornecido
-=======
-// Lista completa de jogos com URLs de capa atualizadas
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
+// Lista completa de jogos para seedar o BD
 const gamesList = [
   {
     title: "Outer Wilds",
@@ -39,11 +35,7 @@ const gamesList = [
     price: 59.9,
     discountPrice: null,
     coverUrl: "https://cdn1.epicgames.com/offer/14ee004dadc142faaaece5a6270fb628/EGS_TheWitcher3WildHuntCompleteEdition_CDPROJEKTRED_S1_2560x1440-82eb5cf8f725e329d3194920c0c0b64f",
-<<<<<<< HEAD
-    isFeatured: false
-=======
     isFeatured: true // DESTAQUE
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
   },
   {
     title: "Cyberpunk 2077",
@@ -73,22 +65,14 @@ const gamesList = [
     price: 259.9,
     discountPrice: null,
     coverUrl: "https://i.ytimg.com/vi/wCqS7jd17ms/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBrZHpjz0lkt2EhGLr64YXN-SeTFw",
-<<<<<<< HEAD
-    isFeatured: true
-=======
     isFeatured: true // DESTAQUE
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
   },
   {
     title: "God of War Ragnarök",
     slug: "god-of-war-ragnarok",
     description: "Kratos e Atreus devem viajar pelos Nove Reinos em busca de respostas.",
     genre: ["Ação", "Aventura"],
-<<<<<<< HEAD
-    ageRating: "L",
-=======
     ageRating: "18",
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
     platforms: ["PS5", "PS4"],
     developer: ["Santa Monica Studio"],
     publisher: ["PlayStation PC LLC"],
@@ -96,22 +80,14 @@ const gamesList = [
     price: 299.9,
     discountPrice: null,
     coverUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202207/1210/4xJ8XB3bi888QTLZYdl7Oi0s.png",
-<<<<<<< HEAD
-    isFeatured: false
-=======
     isFeatured: true // DESTAQUE
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
   },
   {
     title: "Hollow Knight",
     slug: "hollow-knight",
     description: "Uma aventura de ação clássica em 2D por um vasto mundo interligado.",
     genre: ["Metroidvania", "Indie"],
-<<<<<<< HEAD
-    ageRating: "L",
-=======
     ageRating: "10",
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
     platforms: ["PC", "Switch", "PS4"],
     developer: ["Team Cherry"],
     publisher: ["Team Cherry"],
@@ -126,11 +102,7 @@ const gamesList = [
     slug: "red-dead-redemption-2",
     description: "Arthur Morgan e a gangue Van der Linde tentam sobreviver no fim do velho oeste.",
     genre: ["Ação", "Aventura"],
-<<<<<<< HEAD
-    ageRating: "L",
-=======
     ageRating: "18",
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
     platforms: ["PC", "PS4", "Xbox"],
     developer: ["Rockstar Games"],
     publisher: ["Rockstar Games"],
@@ -138,22 +110,14 @@ const gamesList = [
     price: 249,
     discountPrice: null,
     coverUrl: "https://cdn1.epicgames.com/b30b6d1b4dfd4dcc93b5490be5e094e5/offer/RDR2476298253_Epic_Games_Wishlist_RDR2_2560x1440_V01-2560x1440-2a9ebe1f7ee202102555be202d5632ec.jpg",
-<<<<<<< HEAD
-    isFeatured: false
-=======
     isFeatured: true // DESTAQUE
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
   },
   {
     title: "Elden Ring",
     slug: "elden-ring",
     description: "Um RPG de ação em um mundo vasto criado por Hidetaka Miyazaki e George R. R. Martin.",
     genre: ["RPG", "Ação"],
-<<<<<<< HEAD
-    ageRating: "L",
-=======
     ageRating: "16",
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
     platforms: ["PC", "PS5", "Xbox"],
     developer: ["FromSoftware"],
     publisher: ["Bandai Namco"],
@@ -161,22 +125,14 @@ const gamesList = [
     price: 229.9,
     discountPrice: null,
     coverUrl: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/capsule_616x353.jpg?t=1748630546",
-<<<<<<< HEAD
-    isFeatured: false
-=======
     isFeatured: true // DESTAQUE
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
   },
   {
     title: "The Last of Us Part I",
     slug: "the-last-of-us-part-i",
     description: "Em uma civilização devastada, Joel é contratado para tirar Ellie de uma zona de quarentena militar.",
     genre: ["Ação", "Aventura", "Terror"],
-<<<<<<< HEAD
-    ageRating: "L",
-=======
     ageRating: "18",
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
     platforms: ["PC", "PS5"],
     developer: ["Naughty Dog"],
     publisher: ["Sony Interactive Entertainment"],
@@ -191,11 +147,7 @@ const gamesList = [
     slug: "resident-evil-4-remake",
     description: "A sobrevivência é apenas o começo. Seis anos se passaram desde o desastre biológico em Raccoon City.",
     genre: ["Terror", "Ação", "Sobrevivência"],
-<<<<<<< HEAD
-    ageRating: "L",
-=======
     ageRating: "18",
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
     platforms: ["PC", "PS5", "PS4", "Xbox Series"],
     developer: ["Capcom"],
     publisher: ["Capcom"],
@@ -240,11 +192,7 @@ const gamesList = [
     slug: "grand-theft-auto-v",
     description: "Um malandro de rua, um ladrão de bancos aposentado e um psicopata aterrorizante se envolvem com o submundo do crime.",
     genre: ["Ação", "Mundo Aberto"],
-<<<<<<< HEAD
-    ageRating: "L",
-=======
     ageRating: "18",
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
     platforms: ["PC", "PS5", "Xbox Series", "PS4"],
     developer: ["Rockstar North"],
     publisher: ["Rockstar Games"],
@@ -252,22 +200,14 @@ const gamesList = [
     price: 159.9,
     discountPrice: null,
     coverUrl: "https://ogimg.infoglobo.com.br/in/9991682-12c-b99/FT1086A/760/GTA-V-big.jpg",
-<<<<<<< HEAD
-    isFeatured: false
-=======
     isFeatured: true // DESTAQUE
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
   },
   {
     title: "Marvel's Spider-Man 2",
     slug: "marvels-spider-man-2",
     description: "Os Spiders Peter Parker e Miles Morales retornam para uma nova e emocionante aventura.",
     genre: ["Ação", "Aventura", "Super-herói"],
-<<<<<<< HEAD
-    ageRating: "L",
-=======
     ageRating: "12",
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
     platforms: ["PS5"],
     developer: ["Insomniac Games"],
     publisher: ["Sony Interactive Entertainment"],
@@ -275,22 +215,14 @@ const gamesList = [
     price: 349.9,
     discountPrice: null,
     coverUrl: "https://gmedia.playstation.com/is/image/SIEPDC/spider-man-2-keyart-01-en-7june24?$facebook$",
-<<<<<<< HEAD
-    isFeatured: false
-=======
     isFeatured: true // DESTAQUE
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
   },
   {
     title: "Sekiro: Shadows Die Twice",
     slug: "sekiro-shadows-die-twice",
     description: "Trilhe seu próprio caminho de vingança nessa aventura premiada da FromSoftware.",
     genre: ["Ação", "Aventura", "Souls-like"],
-<<<<<<< HEAD
-    ageRating: "L",
-=======
     ageRating: "18",
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
     platforms: ["PC", "PS4", "Xbox One"],
     developer: ["FromSoftware"],
     publisher: ["Activision"],
@@ -335,11 +267,7 @@ const gamesList = [
     slug: "doom-eternal",
     description: "Os exércitos do inferno invadiram a Terra. Torne-se o Slayer em uma campanha épica.",
     genre: ["FPS", "Ação", "Terror"],
-<<<<<<< HEAD
-    ageRating: "L",
-=======
     ageRating: "18",
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
     platforms: ["PC", "PS5", "PS4", "Xbox", "Switch"],
     developer: ["id Software"],
     publisher: ["Bethesda Softworks"],
@@ -354,11 +282,7 @@ const gamesList = [
     slug: "the-legend-of-zelda-breath-of-the-wild",
     description: "Esqueça tudo o que você sabe sobre os jogos da série The Legend of Zelda.",
     genre: ["Aventura", "Ação", "RPG"],
-<<<<<<< HEAD
-    ageRating: "L",
-=======
     ageRating: "10",
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
     platforms: ["Switch", "Wii U"],
     developer: ["Nintendo EPD"],
     publisher: ["Nintendo"],
@@ -373,11 +297,7 @@ const gamesList = [
     slug: "baldurs-gate-3",
     description: "Reúna seu grupo e volte aos Reinos Esquecidos em uma história de amizade, traição e o atrativo do poder absoluto.",
     genre: ["RPG", "Estratégia", "Aventura"],
-<<<<<<< HEAD
-    ageRating: "L",
-=======
     ageRating: "18",
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
     platforms: ["PC", "PS5", "Xbox Series"],
     developer: ["Larian Studios"],
     publisher: ["Larian Studios"],
@@ -385,22 +305,14 @@ const gamesList = [
     price: 199.9,
     discountPrice: null,
     coverUrl: "https://cdn.awsli.com.br/2500x2500/2391/2391623/produto/232708794/baldur-s-gate-3-ps5-c-digo-digital-a6ac8djm3p.png",
-<<<<<<< HEAD
-    isFeatured: false
-=======
     isFeatured: true // DESTAQUE
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
   }
 ];
 
 async function main() {
   console.log('Iniciando o Seeding do banco de dados...');
 
-<<<<<<< HEAD
-  // 1. Criação do Usuário
-=======
   // 1. Criação do Usuário Admin
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
   const testUserPassword = await bcrypt.hash('senha123', SALT_ROUNDS);
   const user = await prisma.user.upsert({
     where: { email: 'teste@game.com' },
@@ -415,18 +327,14 @@ async function main() {
       role: 'ADMIN',
     },
   });
-  console.log(Usuário de teste criado com ID: ${user.id});
+  console.log(`Usuário de teste criado com ID: ${user.id}`);
 
   // 2. Loop para criar/atualizar todos os jogos
   console.log('Criando/Atualizando jogos...');
   
   for (const game of gamesList) {
     await prisma.game.upsert({
-<<<<<<< HEAD
-      where: { title: game.title }, // Usa o título como chave única
-=======
       where: { title: game.title }, // Usa o título como chave única para não duplicar
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
       update: {
         // Se o jogo já existe, atualizamos os dados para garantir que está tudo novo
         coverUrl: game.coverUrl,
@@ -434,12 +342,9 @@ async function main() {
         discountPrice: game.discountPrice ? new Decimal(game.discountPrice) : null,
         description: game.description,
         isFeatured: game.isFeatured,
-<<<<<<< HEAD
-=======
         genre: game.genre,
         ageRating: game.ageRating,
         platforms: game.platforms,
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
       },
       create: {
         title: game.title,
@@ -457,11 +362,7 @@ async function main() {
         isFeatured: game.isFeatured,
       },
     });
-<<<<<<< HEAD
     console.log(`Jogo processado: ${game.title}`);
-=======
-    console.log(Jogo processado: ${game.title});
->>>>>>> 3ee3ff442b10fc1f893e8be5442fe82af2246308
   }
 
   console.log('Seed executada com sucesso!');

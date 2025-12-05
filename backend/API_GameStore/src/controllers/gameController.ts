@@ -6,93 +6,145 @@ import { GameService } from "../services/GameService";
 export const gameController = {
 
 // ===================================
-//          ÁREA DE PÚBLICA
+//          ÁREA PÚBLICA
 // ===================================
-    // GET - Todos os jogos
+
+    // GET - Listar todos os jogos
     async getAllGames(req: Request, res: Response) {
         try {
-            const games = await GameService.findAll(); // Usa o Service
-            res.status(200).json(games); // Sucesso!
-        }catch (error) {
-            res.status(500).json( { error: "Erro ao buscar jogos." }); // Falha...
+            const games = await GameService.findAll(); 
+            res.status(200).json(games); 
+        } catch (error) {
+            res.status(500).json( { error: "Erro ao buscar jogos." }); 
         }
     },
 
-    // GET - Com base no {id}
+    // GET - Buscar jogo por ID ou SLUG
     async getGamesById(req: Request, res: Response) {
         try {
-            const id = parseInt(req.params.id); // Converte ID para número no Controller
+            const param = req.params.id; // O Express chama de 'id', mas pode ser 'god-of-war'
 
-            if (isNaN(id)) {
-            return res.status(400).json({ error: "ID inválido." });
-        }
+            let game;
 
-            const game = await GameService.findById(id); // Usa o Service
+            // Verifica se é puramente numérico (ID)
+            if (!isNaN(Number(param))) {
+                game = await GameService.findById(Number(param)); 
+            } else {
+                // Se não for número, assume que é Slug
+                game = await GameService.findBySlug(param);
+            }
 
             if (!game) {
                 return res.status(404).json({ error: "Jogo correspondente não encontrado" });
             }
-            res.status(200).json(game); // Sucesso!
-        }catch (error) {
-            res.status(500).json( {error: "Erro ao buscar jogo." } ); // Falha...
+            res.status(200).json(game); 
+        } catch (error) {
+            console.error(error);
+            res.status(500).json( {error: "Erro ao buscar jogo." } ); 
         }
     },
 
 // ===================================
 //          ÁREA DE ADMIN
 // ===================================
-    // POST - Novo jogo
+
+    // POST - Criar novo jogo
     async create(req: Request, res: Response) {
         try {
+            // Validação do Zod
             const validatedData = createGameSchema.parse(req.body);
 
-            // Usa o Service
-            const newGame = await GameService.create(validatedData as any);
-            res.status(201).json(newGame); // Sucesso!
+            // Tratamento do Preço Promocional
+            const finalDiscount = (validatedData.discountPrice && Number(validatedData.discountPrice) > 0)
+                ? Number(validatedData.discountPrice)
+                : null;
 
-        }catch (error) {
+            // Montagem do Objeto para o Service
+            const dataToCreate = {
+                ...validatedData,
+                discountPrice: finalDiscount,
+                gallery: validatedData.gallery ? {
+                    create: validatedData.gallery.map((item: any) => ({
+                        type: item.type,
+                        url: item.url
+                    }))
+                } : undefined
+            };
+
+            const newGame = await GameService.create(dataToCreate as any);
+            res.status(201).json(newGame); 
+
+        } catch (error) {
             if (error instanceof ZodError) {
-                return res.status(400).json({ error:"Dados inválidos.", details: error.issues }); // Falha...
+                return res.status(400).json({ error:"Dados inválidos.", details: error.issues }); 
             }
-            res.status(500).json( { error: "Erro ao criar jogo." } ); // Falha...
+            console.error(error);
+            // Verifica erro de chave única (Slug duplicado) do Prisma
+            if ((error as any).code === 'P2002') {
+                return res.status(409).json({ error: "Já existe um jogo com este nome/slug." });
+            }
+            res.status(500).json( { error: "Erro ao criar jogo." } ); 
         }
     },
 
-    // PUT - Atualizar um jogo
+    // PUT - Atualizar jogo existente
     async update(req: Request, res: Response) {
         try{
             const id = parseInt(req.params.id);
+            
+            // Validação do Zod
             const validatedData = updateGameSchema.parse(req.body); 
             
-            const updatedGame = await GameService.update(id, validatedData); // Usa o Service
-            
-            res.status(200).json(updatedGame); // Sucesso!
+            // Extração e Tratamento de Campos Especiais
+            const { discountPrice, gallery, ...rest } = validatedData;
 
-        }catch (error) {
-            if (typeof error === 'object' && error !== null && 'code' in error && error.code === "P2025") {
-                return res.status(404).json({ error: "Jogo não encontrado para ser atualizado. "}); // Falha...
+            const finalDiscount = (discountPrice && Number(discountPrice) > 0)
+                ? Number(discountPrice)
+                : null;
+
+            const dataToUpdate: any = {
+                ...rest,
+                discountPrice: finalDiscount,
+            };
+
+            if (gallery) {
+                dataToUpdate.gallery = {
+                    deleteMany: {}, 
+                    create: gallery.map((item: any) => ({ 
+                        type: item.type,
+                        url: item.url
+                    }))
+                };
+            }
+            
+            const updatedGame = await GameService.update(id, dataToUpdate); 
+            res.status(200).json(updatedGame); 
+
+        } catch (error) {
+            if (typeof error === 'object' && error !== null && 'code' in error && (error as any).code === "P2025") {
+                return res.status(404).json({ error: "Jogo não encontrado para ser atualizado. "}); 
             }
             if (error instanceof ZodError) {
-                return res.status(400).json({ error:"Dados inválidos.", details: error.issues }); // Falha...
+                return res.status(400).json({ error:"Dados inválidos.", details: error.issues }); 
             }
-            res.status(500).json( { error: "Erro ao atualizar jogo." } ); // Falha...
+            console.error(error);
+            res.status(500).json( { error: "Erro ao atualizar jogo." } ); 
         }
     },
 
-    // DELETE - Um jogo
+    // DELETE - Remover jogo
     async delete(req: Request, res: Response) {
         try {
             const id = parseInt(req.params.id);
-            await GameService.delete(id); // Usa o Service
+            await GameService.delete(id); 
 
-            res.status(204).send(); // Sucesso!
+            res.status(204).send(); 
 
-        }catch (error) {
-            if (typeof error === 'object' && error !== null && 'code' in error && error.code === "P2025") {
-                return res.status(404).json( { error: "Jogo não encontrado para ser deletado." }); // Falha...
-
+        } catch (error) {
+            if (typeof error === 'object' && error !== null && 'code' in error && (error as any).code === "P2025") {
+                return res.status(404).json( { error: "Jogo não encontrado para ser deletado." }); 
             }
-            res.status(500).json( { error: "Erro ao deletar jogo. "}); // Falha...
+            res.status(500).json( { error: "Erro ao deletar jogo. "}); 
         }
     },
 };

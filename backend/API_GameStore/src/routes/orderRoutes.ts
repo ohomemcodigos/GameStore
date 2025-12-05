@@ -66,6 +66,6 @@ router.post('/:orderId/pay', authMiddleware, orderController.payOrder);
  *       200:
  *         description: Lista de pedidos
  */
-router.get('/my-orders', authMiddleware, orderController.getUserOrders);
+router.get('/my-orders', authMiddleware, orderController.getMyOrders);
 
 export default router;

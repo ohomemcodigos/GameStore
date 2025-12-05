@@ -6,30 +6,32 @@ export function FeaturedCarousel({ games }: { games: Game[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
 
-  // 1. Tenta pegar só os destaques
+  // Tenta pegar só os destaques
   let featuredGames = games.filter((game) => game.isFeatured);
 
-  // 2. FALLBACK: Se não tiver nenhum destaque, pega os 5 primeiros jogos para não ficar vazio
+  // FALLBACK: Se não tiver nenhum destaque, pega os 5 primeiros
   if (featuredGames.length === 0) {
     featuredGames = games.slice(0, 5);
   }
 
-  // 3. Se a lista de jogos estiver vazia (carregando ou erro), não mostra nada
+  // Se a lista de jogos estiver vazia, não mostra nada
   if (featuredGames.length === 0) return null;
 
   const currentGame = featuredGames[currentIndex];
 
-  // Função para ir para o próximo
+  // Função para navegar usando Slug
+  const handleNavigate = () => {
+    navigate(`/game/${currentGame.slug || currentGame.id}`);
+  };
+
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev === featuredGames.length - 1 ? 0 : prev + 1));
   };
 
-  // Função para voltar
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev === 0 ? featuredGames.length - 1 : prev - 1));
   };
 
-  // Autoplay: muda a cada 6 segundos
   useEffect(() => {
     const timer = setInterval(() => {
       nextSlide();
@@ -43,38 +45,37 @@ export function FeaturedCarousel({ games }: { games: Game[] }) {
   return (
     <div style={{ width: "100%", maxWidth: "1550px", margin: "2rem auto", position: "relative" }}>
       
-      {/* Container Principal (Card Estilo Steam) */}
+      {/* Container Principal */}
       <div
         style={{
           display: "flex",
-          height: "500px", // Altura do carrossel
-          backgroundColor: "#333333", // Fundo bem escuro
+          height: "500px",
+          backgroundColor: "#333333",
           overflow: "hidden",
           position: "relative",
-          borderRadius: "px",
+          borderRadius: "12px", // Adicionei um border radius suave
           border: "0px solid #333"
         }}
       >
-        {/* --- ESQUERDA: IMAGEM GRANDE --- */}
+        {/* --- ESQUERDA: IMAGEM --- */}
         <div
           style={{
-            flex: "2", // Ocupa 2/3 do espaço
+            flex: "2",
             backgroundImage: `url(${currentGame.coverUrl})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
-            boxShadow: "inset -80px 0 80px -20px #0f0f0f", // Degradê para misturar com o lado direito
+            boxShadow: "inset -80px 0 80px -20px #0f0f0f",
             cursor: "pointer",
             position: "relative"
           }}
-          onClick={() => navigate(`/game/${currentGame.id}`)}
+          onClick={handleNavigate} // Usa a nova função
         >
-             {/* Sombra interna embaixo para dar acabamento */}
         </div>
 
         {/* --- DIREITA: INFORMAÇÕES --- */}
         <div
           style={{
-            flex: "1", // Ocupa 1/3 do espaço
+            flex: "1",
             padding: "25px",
             display: "flex",
             flexDirection: "column",
@@ -86,13 +87,12 @@ export function FeaturedCarousel({ games }: { games: Game[] }) {
         >
           <div>
             <h2 
-                onClick={() => navigate(`/game/${currentGame.id}`)}
+                onClick={handleNavigate} // Usa a nova função
                 style={{ fontSize: "2rem", margin: "0 0 15px 0", cursor: "pointer", lineHeight: "1.1" }}
             >
                 {currentGame.title}
             </h2>
             
-            {/* Tags / Gêneros */}
             <div style={{ display: "flex", gap: "5px", flexWrap: "wrap", marginBottom: "20px" }}>
                 {currentGame.genre && currentGame.genre.slice(0, 3).map((g, i) => (
                     <span key={i} style={{ background: "#333", padding: "4px 8px", borderRadius: "2px", fontSize: "0.75rem", color: "#ccc" }}>
@@ -101,7 +101,6 @@ export function FeaturedCarousel({ games }: { games: Game[] }) {
                 ))}
             </div>
 
-            {/* Descrição curta */}
             <p style={{ fontSize: "0.95rem", color: "#acb2b8", lineHeight: "1.5", maxHeight: "120px", overflow: "hidden" }}>
                 {currentGame.description}
             </p>
@@ -112,7 +111,6 @@ export function FeaturedCarousel({ games }: { games: Game[] }) {
                 Já disponível
              </div>
              
-             {/* Preço */}
              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                 <div style={{ textAlign: 'right', background: "#222", padding: "5px 10px", borderRadius: "4px" }}>
                     {currentGame.discountPrice ? (
@@ -134,7 +132,7 @@ export function FeaturedCarousel({ games }: { games: Game[] }) {
           </div>
         </div>
 
-        {/* --- SETAS DE NAVEGAÇÃO --- */}
+        {/* --- SETAS --- */}
         <button 
             onClick={(e) => { e.stopPropagation(); prevSlide(); }}
             style={{
@@ -143,7 +141,7 @@ export function FeaturedCarousel({ games }: { games: Game[] }) {
                 border: "none", color: "white", fontSize: "2.5rem", cursor: "pointer", padding: "10px 15px", 
                 borderRadius: "4px", zIndex: 10, transition: "0.2s"
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "#b6b7e6"} // Fica tosa ao passar o mouse
+            onMouseEnter={(e) => e.currentTarget.style.background = "#b6b7e6"}
             onMouseLeave={(e) => e.currentTarget.style.background = "linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.4))"}
         >
             ❮
@@ -163,7 +161,7 @@ export function FeaturedCarousel({ games }: { games: Game[] }) {
         </button>
       </div>
 
-      {/* --- INDICADORES (DOTS) --- */}
+      {/* --- INDICADORES --- */}
       <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "15px" }}>
         {featuredGames.map((_, idx) => (
             <div 

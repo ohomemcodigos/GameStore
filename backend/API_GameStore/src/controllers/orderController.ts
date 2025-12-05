@@ -1,89 +1,133 @@
-import { Request, Response } from "express";
-import { ZodError } from "zod";
-import { OrderService } from "../services/OrderService"; 
-import { createOrderSchema, payOrderSchema } from "../validators/orderValidator"; 
+import { Request, Response } from 'express';
+import { prisma } from '../config/prisma';
+import { z } from 'zod';
+
+// >> Zod <<
+const createOrderSchema = z.object({
+  gameIds: z.array(
+    z.number()
+  ).min(1, "O carrinho não pode estar vazio."),
+});
+
+// Função auxiliar para gerar chave
+function generateLicenseKey() {
+  const segment = () => Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `${segment()}-${segment()}-${segment()}`;
+}
 
 export const orderController = {
+  
+  // --- CRIAR PEDIDO ---
+  async createOrder(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user.id; 
 
-    // POST: Criar Pedido
-    async createOrder(req: Request, res: Response) {
-        try {
-            const userId = (req as any).user?.id;
-            
-            // Valida e pega apenas gameIds (array de números)
-            const validatedData = createOrderSchema.parse(req.body);
-            
-            // O Service faz toda a mágica (cálculo, verificação de estoque, criação)
-            const newOrder = await OrderService.createOrder({ 
-                userId, 
-                gameIds: validatedData.gameIds
-            });
+      // Validação com o zod
+      const validation = createOrderSchema.safeParse(req.body);
 
-            return res.status(201).json({  // Sucesso!
-                message: "Pedido criado com sucesso.", 
-                order: newOrder 
-            });
+      if (!validation.success) {
+        return res.status(400).json({  // Falha...
+          error: 'Dados inválidos.',
+          details: validation.error.issues.map((err: any) => err.message) 
+        });
+      }
 
-        } catch (error) {
-            if (error instanceof ZodError) {
-                return res.status(400).json({ error: "Dados inválidos.", details: error.issues }); // Falha...
+      const { gameIds } = validation.data;
+
+      // Buscar jogos no banco
+      const games = await prisma.game.findMany({
+        where: { id: { in: gameIds } }
+      });
+
+      if (games.length !== gameIds.length) {
+        return res.status(400).json({ error: 'Um ou mais jogos não foram encontrados.' }); // Falha...
+      }
+
+      // Calcular o total
+      const total = games.reduce((acc: number, game: any) => {
+        const price = game.discountPrice ? Number(game.discountPrice) : Number(game.price);
+        return acc + price;
+      }, 0);
+
+      // Transação
+      const result = await prisma.$transaction(async (tx: any) => {
+        
+        // Fazendo o pedido
+        const order = await tx.order.create({
+          data: {
+            userId,
+            total,
+            status: 'COMPLETED',
+            items: {
+              create: games.map((game: any) => ({
+                gameId: game.id,
+                priceAtPurchase: game.discountPrice || game.price,
+                quantity: 1
+              }))
             }
-            if (error instanceof Error) {
-                return res.status(400).json({ error: error.message }); // Falha...
+          },
+          include: { items: true }
+        });
+
+        // Registrar pagamento (simulado)
+        await tx.transaction.create({
+          data: {
+            orderId: order.id,
+            amount: total,
+            status: 'SUCCESS',
+            paymentMethod: 'CREDIT_CARD',
+            gatewayId: `SIMULATED-${Date.now()}`
+          }
+        });
+
+        // Gerar chaves de licença
+        for (const item of order.items) {
+          await tx.licenseKey.create({
+            data: {
+              keyString: generateLicenseKey(),
+              gameId: item.gameId,
+              isUsed: true, 
+              orderItemId: item.id
             }
-            return res.status(500).json({ error: "Erro interno ao criar o pedido." }); // Falha...
+          });
         }
-    },
 
-    // POST: Pagar Pedido
-    async payOrder(req: Request, res: Response) {
-        try {
-            const orderId = parseInt(req.params.orderId);
-            
-            if (isNaN(orderId)) {
-                 return res.status(400).json({ error: "ID do pedido inválido." }); // Falha...
-            }
+        return order;
+      });
 
-            const validatedData = payOrderSchema.parse(req.body);
+      return res.status(201).json(result); // Sucesso!
 
-            // O Service processa o pagamento
-            const result = await OrderService.processPayment({ 
-                orderId, 
-                paymentMethod: validatedData.paymentMethod, 
-                cardNumber: validatedData.cardNumber 
-            });
-
-            if (result.transaction.status === 'SUCCESS') {
-                return res.status(200).json({  // Sucesso!
-                    message: "Pagamento Aprovado!",
-                    ...result
-                });
-            } else {
-                return res.status(400).json({  // Falha...
-                    error: result.gatewayMessage,
-                    ...result
-                });
-            }
-
-        } catch (error) {
-            if (error instanceof ZodError) {
-                return res.status(400).json({ error: "Dados inválidos.", details: error.issues }); // Falha...
-            }
-            if (error instanceof Error) {
-                return res.status(400).json({ error: error.message }); // Falha...
-            }
-            return res.status(500).json({ error: "Erro ao processar pagamento." }); // Falha...
-        }
-    },
-
-    // GET: Histórico
-    async getUserOrders(req: Request, res: Response) {
-        try {
-            const userId = (req as any).user?.id; 
-            const orders = await OrderService.getUserOrders(userId);
-            return res.status(200).json(orders); // Sucesso!
-        } catch (error) {
-            return res.status(500).json({ error: "Erro ao buscar histórico." }); // Falha...
-        }
+    } catch (error) {
+      console.error('Erro ao criar pedido:', error);
+      return res.status(500).json({ error: 'Erro ao processar compra.' }); // Falha...
     }
+  },
+
+  // --- MEUS PEDIDOS ---
+  async getMyOrders(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user.id;
+
+      const orders = await prisma.order.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          items: {
+            include: {
+              game: true, 
+              licenseKeys: true 
+            }
+          }
+        }
+      });
+
+      return res.json(orders);
+    } catch (error) {
+      return res.status(500).json({ error: 'Erro ao buscar pedidos.' }); // Falha...
+    }
+  },
+
+  async payOrder(req: Request, res: Response) {
+     return res.json({ message: "Pagamento já realizado." });
+  }
 };

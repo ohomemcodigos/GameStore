@@ -1,20 +1,17 @@
-import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import { useAuth } from "../context/AuthContext";
 import { userService } from "../api/user";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Lock, Camera, AlertTriangle } from "lucide-react";
+import { ArrowLeft, User, Lock, Camera, AlertTriangle, Mail, KeyRound, Save, Shield } from "lucide-react";
 import defaultAvatar from "../assets/icon.png";
 
-// Cor definida pelo usuário
-const PRIMARY_COLOR = "#5241b2";
+const PRIMARY_COLOR = "#6c5ce7";
 
 export function Profile() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"personal" | "security">(
-    "personal"
-  );
+  const [activeTab, setActiveTab] = useState<"personal" | "security">("personal");
 
   // --- ESTADOS DADOS PESSOAIS ---
   const [name, setName] = useState("");
@@ -26,7 +23,6 @@ export function Profile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Carregar dados iniciais
   useEffect(() => {
     if (user) {
       setName(user.name || "");
@@ -36,7 +32,6 @@ export function Profile() {
     }
   }, [user]);
 
-  // Upload de Imagem
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -46,7 +41,6 @@ export function Profile() {
     }
   };
 
-  // --- SALVAR DADOS PESSOAIS (Sem senha) ---
   async function handleSavePersonal(e: FormEvent) {
     e.preventDefault();
     if (!user) return;
@@ -64,7 +58,6 @@ export function Profile() {
     }
   }
 
-  // --- SALVAR SEGURANÇA (Email e Senha) ---
   async function handleSaveSecurity(e: FormEvent) {
     e.preventDefault();
     if (!user) return;
@@ -89,7 +82,6 @@ export function Profile() {
       if (newPassword) payload.password = newPassword;
 
       await userService.updateProfile(user.id, payload);
-
       alert("Dados de segurança atualizados! Por favor, faça login novamente.");
       window.location.reload();
     } catch (error) {
@@ -100,261 +92,159 @@ export function Profile() {
     }
   }
 
+  // Styles Helpers
+  const inputContainerStyle = {
+    position: 'relative' as const,
+    marginBottom: '1rem'
+  };
+
+  const iconInputStyle = {
+    position: 'absolute' as const,
+    left: '12px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    color: '#888',
+    pointerEvents: 'none' as const
+  };
+
   return (
-    <div
-      style={{
-        padding: "2rem",
-        minHeight: "100vh",
-        backgroundColor: "#1a1a1a",
-        color: "white",
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
-      <div style={{ maxWidth: "600px", width: "100%" }}>
-        <div
-          style={{
-            marginBottom: 12,
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
-          {/* Botão de Voltar (Seta) */}
-          <button
-            onClick={() => navigate("/")}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#aaa",
-              cursor: "pointer",
-              display: "flex",
-              padding: 0,
-            }}
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M19 12H5" />
-              <path d="M12 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          {/* Seu Título */}
-          <h2 style={{ margin: 0, color: "#fff" }}>Meu Perfil</h2>
-        </div>
-        <div
-          style={{
-            background: "#252525",
-            borderRadius: "8px",
-            overflow: "hidden",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-          }}
-        >
-          {/* --- ABAS DE NAVEGAÇÃO --- */}
-          <div style={{ display: "flex", borderBottom: "1px solid #444" }}>
-            <button
-              onClick={() => setActiveTab("personal")}
-              style={{
-                ...tabStyle,
-                background: activeTab === "personal" ? "#333" : "transparent",
-                color: activeTab === "personal" ? PRIMARY_COLOR : "#ccc",
-                borderBottom:
-                  activeTab === "personal"
-                    ? `2px solid ${PRIMARY_COLOR}`
-                    : "none",
-              }}
-            >
-              <User size={18} /> Dados Pessoais
+    <div style={{ padding: "2rem", minHeight: "100vh", backgroundColor: "#121212", color: "white", display: "flex", justifyContent: "center", alignItems: 'flex-start', paddingTop: '4rem' }}>
+      
+      <div style={{ maxWidth: "900px", width: "100%", display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+        
+        {/* --- COLUNA DA ESQUERDA --- */}
+        <div style={{ flex: 1, minWidth: '280px' }}>
+            
+            {/* Botão Voltar */}
+            <button onClick={() => navigate("/")} style={{ background: "transparent", border: "1px solid #333", borderRadius: '8px', color: "#ccc", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", padding: '8px 16px', marginBottom: '1.5rem', fontSize: '0.9rem', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#fff'; e.currentTarget.style.color = '#fff'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#333'; e.currentTarget.style.color = '#ccc'; }}>
+                <ArrowLeft size={18} /> Voltar para Loja
             </button>
-            <button
-              onClick={() => setActiveTab("security")}
-              style={{
-                ...tabStyle,
-                background: activeTab === "security" ? "#333" : "transparent",
-                color: activeTab === "security" ? "#ef4444" : "#ccc",
-                borderBottom:
-                  activeTab === "security" ? "2px solid #ef4444" : "none",
-              }}
-            >
-              <Lock size={18} /> Segurança
-            </button>
-          </div>
 
-          <div style={{ padding: "2rem" }}>
-            {/* === FORMULÁRIO 1: DADOS PESSOAIS === */}
-            {activeTab === "personal" && (
-              <form onSubmit={handleSavePersonal}>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    marginBottom: "2rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "200px",
-                      height: "200px",
-                      borderRadius: "50%",
-                      overflow: "hidden",
-                      border: `0px solid ${PRIMARY_COLOR}`,
-                      marginBottom: "15px",
-                      background: "#000",
-                    }}
-                  >
-                    {/* CORREÇÃO AQUI: removi as aspas do defaultAvatar */}
-                    <img
-                      src={avatarUrl || defaultAvatar}
-                      alt="Avatar"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
+            {/* Card do Avatar */}
+            <div style={{ background: "#1e1e1e", borderRadius: "12px", padding: "2rem", display: 'flex', flexDirection: 'column', alignItems: 'center', border: '1px solid #333', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}>
+                <div style={{ position: 'relative', width: "120px", height: "120px", marginBottom: "1rem" }}>
+                    <img 
+                        src={avatarUrl || defaultAvatar} 
+                        alt="Avatar" 
+                        style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover", border: `3px solid ${PRIMARY_COLOR}` }} 
                     />
-                  </div>
-                  <label
-                    style={{
-                      background: "#444",
-                      padding: "8px 16px",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      fontSize: "0.85rem",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      transition: "background 0.2s",
-                    }}
-                  >
-                    <Camera size={16} /> Alterar Foto
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      style={{ display: "none" }}
-                    />
-                  </label>
+                    <label style={{ position: 'absolute', bottom: 0, right: 0, background: PRIMARY_COLOR, width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '3px solid #1e1e1e' }}>
+                        <Camera size={18} color="white" />
+                        <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: "none" }} />
+                    </label>
                 </div>
+                
+                <h2 style={{ margin: '0 0 5px 0', fontSize: '1.4rem' }}>{name || "Usuário"}</h2>
+                <span style={{ color: '#888', fontSize: '0.9rem' }}>@{nickname || "nickname"}</span>
+            </div>
 
-                <div style={{ display: "grid", gap: "1rem" }}>
-                  <div>
-                    <label style={labelStyle}>Nome Completo</label>
-                    <input
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      style={inputStyle}
-                    />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Apelido</label>
-                    <input
-                      value={nickname}
-                      onChange={(e) => setNickname(e.target.value)}
-                      placeholder=""
-                      style={inputStyle}
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{ ...buttonStyle, background: PRIMARY_COLOR }}
+            {/* Menu de Navegação Vertical (Abas) */}
+            <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <button 
+                    onClick={() => setActiveTab("personal")}
+                    style={{ 
+                        padding: '12px 16px', borderRadius: '8px', border: 'none', background: activeTab === 'personal' ? '#2d2d2d' : 'transparent', 
+                        color: activeTab === 'personal' ? PRIMARY_COLOR : '#ccc', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px',
+                        fontSize: '1rem', fontWeight: activeTab === 'personal' ? 'bold' : 'normal', transition: 'all 0.2s', textAlign: 'left'
+                    }}
                 >
-                  {loading ? "Salvando..." : "Salvar Perfil"}
+                    <User size={20} /> Dados Pessoais
                 </button>
-              </form>
-            )}
-
-            {/* === FORMULÁRIO 2: SEGURANÇA === */}
-            {activeTab === "security" && (
-              <form onSubmit={handleSaveSecurity}>
-                <div
-                  style={{
-                    fontSize: "0.9rem",
-                    color: "#ffcccb",
-                    marginBottom: "1.5rem",
-                    padding: "12px",
-                    background: "rgba(239, 68, 68, 0.1)",
-                    borderRadius: "6px",
-                    border: "1px solid rgba(239, 68, 68, 0.2)",
-                    display: "flex",
-                    alignItems: "start",
-                    gap: "10px",
-                  }}
-                >
-                  <AlertTriangle size={20} style={{ flexShrink: 0 }} />
-                  <span>
-                    Cuidado ao alterar estes dados. Você precisará usar o novo
-                    email/senha no próximo login.
-                  </span>
-                </div>
-
-                <div style={{ display: "grid", gap: "1rem" }}>
-                  <div>
-                    <label style={labelStyle}>E-mail de Acesso</label>
-                    <input
-                      required
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      style={inputStyle}
-                    />
-                  </div>
-
-                  <hr
-                    style={{
-                      borderColor: "#444",
-                      margin: "1rem 0",
-                      width: "100%",
-                      opacity: 0.5,
+                <button 
+                    onClick={() => setActiveTab("security")}
+                    style={{ 
+                        padding: '12px 16px', borderRadius: '8px', border: 'none', background: activeTab === 'security' ? 'rgba(239, 68, 68, 0.1)' : 'transparent', 
+                        color: activeTab === 'security' ? '#ef4444' : '#ccc', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px',
+                        fontSize: '1rem', fontWeight: activeTab === 'security' ? 'bold' : 'normal', transition: 'all 0.2s', textAlign: 'left'
                     }}
-                  />
-
-                  <div>
-                    <label style={labelStyle}>Nova Senha</label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Digite para alterar"
-                      style={inputStyle}
-                    />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Confirmar Nova Senha</label>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Repita a senha"
-                      style={inputStyle}
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{ ...buttonStyle, background: "#ef4444" }}
                 >
-                  {loading ? "Salvando..." : "Atualizar Segurança"}
+                    <Shield size={20} /> Segurança e Login
                 </button>
-              </form>
-            )}
-          </div>
+            </div>
         </div>
+
+        {/* --- COLUNA DA DIREITA --- */}
+        <div style={{ flex: 2, minWidth: '300px' }}>
+            <div style={{ background: "#1e1e1e", borderRadius: "12px", border: '1px solid #333', padding: "2rem", minHeight: '400px' }}>
+                
+                {/* --- ABA PESSOAL --- */}
+                {activeTab === "personal" && (
+                    <form onSubmit={handleSavePersonal} style={{ animation: 'fadeIn 0.3s ease-in-out' }}>
+                        <h2 style={{ marginTop: 0, marginBottom: '1.5rem', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <User size={24} color={PRIMARY_COLOR} /> Editar Perfil
+                        </h2>
+
+                        <div style={inputContainerStyle}>
+                            <label style={labelStyle}>Nome Completo</label>
+                            <div style={{ position: 'relative' }}>
+                                <User size={18} style={iconInputStyle} />
+                                <input required value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} placeholder="Seu nome" />
+                            </div>
+                        </div>
+
+                        <div style={inputContainerStyle}>
+                            <label style={labelStyle}>Apelido (Nickname)</label>
+                            <div style={{ position: 'relative' }}>
+                                <span style={{ ...iconInputStyle, fontSize: '1.2rem', fontWeight: 'bold' }}>@</span>
+                                <input value={nickname} onChange={(e) => setNickname(e.target.value)} style={inputStyle} placeholder="Como quer ser chamado" />
+                            </div>
+                        </div>
+
+                        <button type="submit" disabled={loading} style={{ ...buttonStyle, background: PRIMARY_COLOR, marginTop: '1rem' }}>
+                            {loading ? "Salvando..." : <><Save size={18} /> Salvar Alterações</>}
+                        </button>
+                    </form>
+                )}
+
+                {/* --- ABA DE SEGURANÇA --- */}
+                {activeTab === "security" && (
+                    <form onSubmit={handleSaveSecurity} style={{ animation: 'fadeIn 0.3s ease-in-out' }}>
+                        <h2 style={{ marginTop: 0, marginBottom: '1.5rem', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#ef4444' }}>
+                            <Lock size={24} /> Segurança
+                        </h2>
+
+                        <div style={{ fontSize: "0.9rem", color: "#ffcccb", marginBottom: "1.5rem", padding: "12px", background: "rgba(239, 68, 68, 0.1)", borderRadius: "6px", border: "1px solid rgba(239, 68, 68, 0.2)", display: "flex", gap: "10px" }}>
+                            <AlertTriangle size={20} style={{ flexShrink: 0 }} />
+                            <span>Atenção: Ao alterar seu e-mail ou senha, você precisará fazer login novamente.</span>
+                        </div>
+
+                        <div style={inputContainerStyle}>
+                            <label style={labelStyle}>E-mail de Acesso</label>
+                            <div style={{ position: 'relative' }}>
+                                <Mail size={18} style={iconInputStyle} />
+                                <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
+                            </div>
+                        </div>
+
+                        <hr style={{ borderColor: "#333", margin: "1.5rem 0", opacity: 0.5 }} />
+
+                        <div style={inputContainerStyle}>
+                            <label style={labelStyle}>Nova Senha</label>
+                            <div style={{ position: 'relative' }}>
+                                <KeyRound size={18} style={iconInputStyle} />
+                                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Deixe em branco para manter a atual" style={inputStyle} />
+                            </div>
+                        </div>
+
+                        <div style={inputContainerStyle}>
+                            <label style={labelStyle}>Confirmar Nova Senha</label>
+                            <div style={{ position: 'relative' }}>
+                                <Lock size={18} style={iconInputStyle} />
+                                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repita a nova senha" style={inputStyle} />
+                            </div>
+                        </div>
+
+                        <button type="submit" disabled={loading} style={{ ...buttonStyle, background: "#ef4444", marginTop: '1rem' }}>
+                            {loading ? "Processando..." : "Atualizar Segurança"}
+                        </button>
+                    </form>
+                )}
+
+            </div>
+        </div>
+
       </div>
+      <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
     </div>
   );
 }
@@ -362,44 +252,37 @@ export function Profile() {
 // Estilos
 const inputStyle = {
   width: "100%",
-  padding: "12px",
-  borderRadius: "6px",
+  padding: "12px 12px 12px 40px", // Espaço para o ícone
+  borderRadius: "8px",
   border: "1px solid #444",
-  backgroundColor: "#333",
+  backgroundColor: "#2a2a2a",
   color: "white",
-  fontSize: "1rem",
+  fontSize: "0.95rem",
+  outline: "none",
   boxSizing: "border-box" as const,
+  transition: 'border-color 0.2s'
 };
 
 const labelStyle = {
   display: "block",
-  marginBottom: "5px",
+  marginBottom: "8px",
   fontSize: "0.9rem",
-  color: "#aaa",
-};
-
-const tabStyle = {
-  flex: 1,
-  padding: "15px",
-  cursor: "pointer",
-  border: "none",
-  fontSize: "1rem",
-  fontWeight: "bold",
-  transition: "all 0.2s",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "8px",
+  color: "#ccc",
+  fontWeight: 500
 };
 
 const buttonStyle = {
-  marginTop: "2rem",
   width: "100%",
   padding: "12px",
   color: "white",
   border: "none",
-  borderRadius: "4px",
+  borderRadius: "8px",
   fontWeight: "bold",
   fontSize: "1rem",
   cursor: "pointer",
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '10px',
+  transition: 'opacity 0.2s'
 };

@@ -1,7 +1,7 @@
-// src/controllers/ReviewController.ts
-
 import { Request, Response } from 'express';
 import { ReviewService } from '../services/reviewservice';
+import { createReviewSchema } from '../validators/reviewValidator';
+import { ZodError } from 'zod';
 
 interface AuthenticatedRequest extends Request {
     user?: {
@@ -9,37 +9,30 @@ interface AuthenticatedRequest extends Request {
     }
 }
 
-/**
- * Cria uma nova avaliação (POST /api/reviews/games/:gameId)
- */
+/*
+ * Cria uma nova avaliação (POST)
+*/
 export const createReview = async (req: Request, res: Response) => {
     const authReq = req as AuthenticatedRequest;
 
+    // IDs vindos da URL e do Token não passam pelo Zod do body, 
+    // então mantemos a conversão simples aqui.
     const gameId = Number(req.params.gameId);
     const userId = Number(authReq.user?.id);
-    const { rating, comment } = req.body;
-
-    // Validação de presença
-    if (!rating || !comment || isNaN(gameId) || isNaN(userId)) {
-        return res.status(400).json({ message: "Dados de avaliação incompletos." });
-    }
-
-    // Validação de rating (1-5)
-    if (rating < 1 || rating > 5) {
-        return res.status(400).json({ message: "Rating deve estar entre 1 e 5." });
-    }
-
-    // Validação de comentário
-    if (typeof comment !== 'string' || comment.trim().length === 0) {
-        return res.status(400).json({ message: "Comentário inválido." });
-    }
 
     try {
-        console.log('--- REQUISIÇÃO DE REVIEW RECEBIDA ---');
-        console.log('Game ID:', gameId);
-        console.log('User ID:', userId);
-        console.log('Rating:', rating, 'Comment:', comment);
+        // Validação Manual dos IDs (Segurança básica)
+        if (isNaN(gameId) || isNaN(userId)) {
+            return res.status(400).json({ message: "ID do jogo ou usuário inválido." });
+        }
 
+        // Validação do Body com Zod
+        const { rating, comment } = createReviewSchema.parse(req.body);
+
+        console.log('--- REQUISIÇÃO DE REVIEW VALIDADA ---');
+        console.log('Game ID:', gameId, 'User ID:', userId);
+
+        // Chamada do Serviço
         const newReview = await ReviewService.createReview({
             gameId,
             userId,
@@ -50,13 +43,21 @@ export const createReview = async (req: Request, res: Response) => {
         return res.status(201).json(newReview);
 
     } catch (error) {
+        // Tratamento de Erro do Zod
+        if (error instanceof ZodError) {
+            return res.status(400).json({ 
+                message: "Dados de avaliação inválidos.", 
+                details: error.issues // Retorna array detalhado do erro
+            });
+        }
+
         console.error('Erro ao criar avaliação:', error);
         return res.status(500).json({ message: "Erro interno do servidor ao salvar avaliação." });
     }
 };
 
-/**
- * Lista as avaliações de um jogo (GET /api/reviews/games/:gameId)
+/*
+ * Lista as avaliações de um jogo (GET)
  */
 export const getReviews = async (req: Request, res: Response) => {
     const gameId = Number(req.params.gameId);
